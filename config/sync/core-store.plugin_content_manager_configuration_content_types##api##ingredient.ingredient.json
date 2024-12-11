@@ -1,0 +1,174 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::ingredient.ingredient",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "Name",
+      "defaultSortBy": "Name",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "Name": {
+        "edit": {
+          "label": "Name",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "Name",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "Price": {
+        "edit": {
+          "label": "Price",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "Price",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "allergens": {
+        "edit": {
+          "label": "allergens",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "Name"
+        },
+        "list": {
+          "label": "allergens",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "ingredient_wrappers": {
+        "edit": {
+          "label": "ingredient_wrappers",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "id"
+        },
+        "list": {
+          "label": "ingredient_wrappers",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "Name",
+        "Price",
+        "createdAt"
+      ],
+      "edit": [
+        [
+          {
+            "name": "Name",
+            "size": 6
+          },
+          {
+            "name": "Price",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "allergens",
+            "size": 6
+          },
+          {
+            "name": "ingredient_wrappers",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "api::ingredient.ingredient"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

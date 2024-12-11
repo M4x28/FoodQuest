@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ingredient_wrappers",
+  "info": {
+    "singularName": "ingredient-wrapper",
+    "pluralName": "ingredient-wrappers",
+    "displayName": "IngredientWrapper",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "ingredients": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::ingredient.ingredient",
+      "inversedBy": "ingredient_wrappers"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "ingredient_wrapper"
+    }
+  }
+}

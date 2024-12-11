@@ -1,0 +1,233 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::product.product",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "Name",
+      "defaultSortBy": "Name",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "Name": {
+        "edit": {
+          "label": "Name",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "Name",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "Price": {
+        "edit": {
+          "label": "Price",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "Price",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "Available": {
+        "edit": {
+          "label": "Available",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "Available",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "TimeToPrepare": {
+        "edit": {
+          "label": "TimeToPrepare",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "TimeToPrepare",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "ingredient_wrapper": {
+        "edit": {
+          "label": "ingredient_wrapper",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "id"
+        },
+        "list": {
+          "label": "ingredient_wrapper",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "category": {
+        "edit": {
+          "label": "category",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "Name"
+        },
+        "list": {
+          "label": "category",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "partial_order": {
+        "edit": {
+          "label": "partial_order",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "id"
+        },
+        "list": {
+          "label": "partial_order",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "Name",
+        "Price",
+        "Available"
+      ],
+      "edit": [
+        [
+          {
+            "name": "Name",
+            "size": 6
+          },
+          {
+            "name": "Price",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "Available",
+            "size": 4
+          },
+          {
+            "name": "TimeToPrepare",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "ingredient_wrapper",
+            "size": 6
+          },
+          {
+            "name": "category",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "partial_order",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "api::product.product"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

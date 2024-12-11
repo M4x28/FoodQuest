@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "partial_orders",
+  "info": {
+    "singularName": "partial-order",
+    "pluralName": "partial-orders",
+    "displayName": "PartialOrder"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "State": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "enumeration",
+      "enum": [
+        "Pending",
+        "In Progress",
+        "Done"
+      ],
+      "required": true,
+      "default": "Pending"
+    },
+    "product": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product.product",
+      "inversedBy": "partial_order"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "partial_order"
+    },
+    "order": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::order.order",
+      "inversedBy": "partial_orders"
+    }
+  }
+}

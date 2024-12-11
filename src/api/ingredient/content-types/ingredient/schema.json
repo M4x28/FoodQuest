@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ingredients",
+  "info": {
+    "singularName": "ingredient",
+    "pluralName": "ingredients",
+    "displayName": "Ingredient",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "Name": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "string",
+      "required": true
+    },
+    "Price": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "allergens": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::allergen.allergen",
+      "inversedBy": "ingredients"
+    },
+    "ingredient_wrappers": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::ingredient-wrapper.ingredient-wrapper",
+      "mappedBy": "ingredients"
+    }
+  }
+}

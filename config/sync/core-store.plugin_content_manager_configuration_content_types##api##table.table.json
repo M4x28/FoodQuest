@@ -1,0 +1,173 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::table.table",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "AccessCode",
+      "defaultSortBy": "AccessCode",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "Number": {
+        "edit": {
+          "label": "Number",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "Number",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "AccessCode": {
+        "edit": {
+          "label": "AccessCode",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "AccessCode",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "CheckRequest": {
+        "edit": {
+          "label": "CheckRequest",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "CheckRequest",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "orders": {
+        "edit": {
+          "label": "orders",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "id"
+        },
+        "list": {
+          "label": "orders",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "Number",
+        "AccessCode",
+        "CheckRequest"
+      ],
+      "edit": [
+        [
+          {
+            "name": "Number",
+            "size": 4
+          },
+          {
+            "name": "AccessCode",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "CheckRequest",
+            "size": 4
+          },
+          {
+            "name": "orders",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "api::table.table"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}
