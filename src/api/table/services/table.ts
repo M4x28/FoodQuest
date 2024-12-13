@@ -8,10 +8,10 @@ export default factories.createCoreService('api::table.table', ( ({strapi}) => (
 
     //Verify that exist a table with AccessCode <code>
     //Return Table number if found or null if not 
-    async verify(code){
-        
-        const table = await strapi.db.query('api::table.table').findOne({
-            where: {
+    async verify(code:string){
+
+        const table = await strapi.documents('api::table.table').findFirst({
+            filters: {
                 AccessCode: code
             }
         });

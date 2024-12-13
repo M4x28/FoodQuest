@@ -22,11 +22,16 @@
       "target": "api::ingredient.ingredient",
       "inversedBy": "ingredient_wrappers"
     },
-    "products": {
+    "product": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "oneToOne",
       "target": "api::product.product",
-      "mappedBy": "ingredient_wrapper"
+      "inversedBy": "ingredient_wrapper"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::category.category"
     }
   }
 }

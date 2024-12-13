@@ -4,4 +4,123 @@
 
 import { factories } from '@strapi/strapi';
 
-export default factories.createCoreService('api::product.product');
+export interface ProductIngredientDetail{
+    categoryID:string,
+    ingredientsID:string[];
+}
+
+export default factories.createCoreService('api::product.product',(({strapi}) => ({
+
+    async createIgProduct(product:ProductIngredientDetail):Promise<string> {
+
+        //Catch missing input
+        if(!product.categoryID || !product.ingredientsID){
+            return null;
+        }
+
+        const targetProduct:string|null = await this.findProductFromIngredient(product.ingredientsID);
+
+        if(targetProduct){
+            return targetProduct;
+        } else { 
+            return await productFactory(product);
+        }
+    },
+
+    findProductFromIngredient(ingredientsID:string[]):Promise<string|null>{
+        return strapi.documents("api::ingredient-wrapper.ingredient-wrapper")
+        .findMany({
+            populate:{
+                ingredients:{
+                    fields:["id"],
+                },
+                product:{
+                    fields:["id"]
+                }
+            },
+            filters:{
+                //Check if wrapper contains every ingredients requesed
+                $and: ingredientsID.map((ig) => ({ingredients:{
+                    documentId:ig,
+                }}))
+            },
+        }).then((result) => {
+            //Right wrapper must have exactly ingredientsID.lenght ingredients, filtering out the one with extra
+            const targetWrapper = result
+                .filter((value) => value.ingredients.length == ingredientsID.length);
+            if(targetWrapper.length == 1){
+                return targetWrapper[0].product.documentId;
+            }
+            else return null;
+        });
+    }
+
+})));
+
+
+//UTILIY METHODS
+export async function ingredientsPrice(ingredientsID:string[]):Promise<number> {
+    
+    //Feching price of every ingredient
+    const ig = await strapi.documents("api::ingredient.ingredient").findMany(
+        {
+            fields:["Price"],
+            filters:{
+                documentId:{
+                    $in:ingredientsID,
+                }
+            }
+        }
+    );
+
+    return ig.map((ig) => (ig.Price))
+        .reduce((total,price) => (total + price), 0);
+}
+
+export async function productFactory(product:ProductIngredientDetail):Promise<string>{
+    
+    let newWrapper;
+    let newProduct;
+
+    //Create both new Wrapper and new Product in parallel
+    await Promise.all([
+        //Create Wrapper
+        strapi.documents("api::ingredient-wrapper.ingredient-wrapper")
+            .create({
+                data:{
+                    category: product.categoryID,
+                    ingredients: product.ingredientsID
+                },
+            status: "published",  
+        }).then((wrapper) => newWrapper = wrapper),
+        
+        //Create Product
+        //Before creatign must fetch price
+        ingredientsPrice(product.ingredientsID).then(async (price) => {
+            price += 2 // TODO Modificare per il base price
+            newProduct = await strapi.documents("api::product.product")
+            .create({
+                data:{
+                    Name:"Custom",
+                    category: product.categoryID,
+                    Available: false,
+                    Price: price,
+                    TimeToPrepare: product.ingredientsID.length + 5,
+                },
+                status: "published",
+            });
+        })
+    ])
+
+    //Linking toghether product and wrapper
+    await strapi.documents("api::ingredient-wrapper.ingredient-wrapper")
+    .update({
+        documentId: newWrapper.documentId,
+        data:{
+            product: newProduct.documentId,
+        },
+        status: "published",
+    })
+
+    return newProduct.documentId;
+}

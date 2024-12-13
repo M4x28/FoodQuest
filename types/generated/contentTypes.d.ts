@@ -477,6 +477,7 @@ export interface ApiIngredientWrapperIngredientWrapper
     };
   };
   attributes: {
+    category: Schema.Attribute.Relation<'oneToOne', 'api::category.category'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -489,7 +490,7 @@ export interface ApiIngredientWrapperIngredientWrapper
       'oneToMany',
       'api::ingredient-wrapper.ingredient-wrapper'
     >;
-    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
+    product: Schema.Attribute.Relation<'oneToOne', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -683,7 +684,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     ingredient_wrapper: Schema.Attribute.Relation<
-      'manyToOne',
+      'oneToOne',
       'api::ingredient-wrapper.ingredient-wrapper'
     >;
     locale: Schema.Attribute.String;
