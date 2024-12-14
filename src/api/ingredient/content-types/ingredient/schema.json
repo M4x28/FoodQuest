@@ -46,6 +46,20 @@
       "relation": "manyToMany",
       "target": "api::ingredient-wrapper.ingredient-wrapper",
       "mappedBy": "ingredients"
+    },
+    "Type": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "enumeration",
+      "enum": [
+        "default",
+        "pizza-base"
+      ],
+      "required": true,
+      "default": "default"
     }
   }
 }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "allergen",
     "pluralName": "allergens",
-    "displayName": "Allergen"
+    "displayName": "Allergen",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -26,18 +27,18 @@
       "unique": true
     },
     "Icon": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
       "allowedTypes": [
         "images",
         "files"
       ],
-      "type": "media",
-      "multiple": false,
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      },
-      "required": true
+      }
     },
     "ingredients": {
       "type": "relation",

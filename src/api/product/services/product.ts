@@ -18,16 +18,17 @@ export default factories.createCoreService('api::product.product',(({strapi}) =>
             return null;
         }
 
-        const targetProduct:string|null = await this.findProductFromIngredient(product.ingredientsID);
+        const targetProduct:string|null = await this.findProductFromIngredient(product);
 
         if(targetProduct){
             return targetProduct;
         } else { 
+            console.log("3");
             return await productFactory(product);
         }
     },
 
-    findProductFromIngredient(ingredientsID:string[]):Promise<string|null>{
+    findProductFromIngredient(product:ProductIngredientDetail ):Promise<string|null>{
         return strapi.documents("api::ingredient-wrapper.ingredient-wrapper")
         .findMany({
             populate:{
@@ -39,15 +40,18 @@ export default factories.createCoreService('api::product.product',(({strapi}) =>
                 }
             },
             filters:{
+                category: {
+                    documentId:product.categoryID,
+                },
                 //Check if wrapper contains every ingredients requesed
-                $and: ingredientsID.map((ig) => ({ingredients:{
+                $and: product.ingredientsID.map((ig) => ({ingredients:{
                     documentId:ig,
                 }}))
             },
         }).then((result) => {
             //Right wrapper must have exactly ingredientsID.lenght ingredients, filtering out the one with extra
             const targetWrapper = result
-                .filter((value) => value.ingredients.length == ingredientsID.length);
+                .filter((value) => value.ingredients.length == product.ingredientsID.length);
             if(targetWrapper.length == 1){
                 return targetWrapper[0].product.documentId;
             }
@@ -78,12 +82,9 @@ export async function ingredientsPrice(ingredientsID:string[]):Promise<number> {
 }
 
 export async function productFactory(product:ProductIngredientDetail):Promise<string>{
-    
-    let newWrapper;
-    let newProduct;
 
     //Create both new Wrapper and new Product in parallel
-    await Promise.all([
+    const [newWrapper,newProduct] = await Promise.all([
         //Create Wrapper
         strapi.documents("api::ingredient-wrapper.ingredient-wrapper")
             .create({
@@ -92,13 +93,12 @@ export async function productFactory(product:ProductIngredientDetail):Promise<st
                     ingredients: product.ingredientsID
                 },
             status: "published",  
-        }).then((wrapper) => newWrapper = wrapper),
+        }),
         
         //Create Product
         //Before creatign must fetch price
         ingredientsPrice(product.ingredientsID).then(async (price) => {
-            price += 2 // TODO Modificare per il base price
-            newProduct = await strapi.documents("api::product.product")
+            return await strapi.documents("api::product.product")
             .create({
                 data:{
                     Name:"Custom",

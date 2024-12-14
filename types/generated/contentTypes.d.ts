@@ -372,6 +372,7 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiAllergenAllergen extends Struct.CollectionTypeSchema {
   collectionName: 'allergens';
   info: {
+    description: '';
     displayName: 'Allergen';
     pluralName: 'allergens';
     singularName: 'allergen';
@@ -552,6 +553,14 @@ export interface ApiIngredientIngredient extends Struct.CollectionTypeSchema {
         number
       >;
     publishedAt: Schema.Attribute.DateTime;
+    Type: Schema.Attribute.Enumeration<['default', 'pizza-base']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'default'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
