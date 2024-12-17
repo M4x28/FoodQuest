@@ -14,6 +14,7 @@ export default factories.createCoreService('api::table.table', ( ({strapi}) => (
             filters: {
                 AccessCode: accessCode,
                 SessionCode: sessionCode,
+                CheckRequest: false,
             }
         });
 

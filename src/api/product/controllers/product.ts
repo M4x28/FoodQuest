@@ -27,7 +27,7 @@ export default factories.createCoreController('api::product.product', ( ({strapi
         const tableID = await strapi.service("api::table.table").verify(table.accessCode,table.sessionCode);
         if(!tableID)
             throw new UnauthorizedError("Invalid table credential");
-
+        
         //Preprocess product before creation
         const processedProd = await productPreprocessor(product);
         if(!processedProd)
