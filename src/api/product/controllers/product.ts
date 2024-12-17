@@ -9,6 +9,11 @@ import productPreprocessor from './productPreprocessor';
 
 const { ApplicationError, UnauthorizedError } = errors;
 
+interface Table{
+    accessCode: string,
+    sessionCode: string    
+};
+
 export default factories.createCoreController('api::product.product', ( ({strapi}) => ({
 
     async createCustomProduct(ctx){
@@ -16,12 +21,12 @@ export default factories.createCoreController('api::product.product', ( ({strapi
         if(!ctx.request.body || !ctx.request.body.table || !ctx.request.body.product)
             throw new ApplicationError("Missing field in request");
 
-        const {table,product} = ctx.request.body as {table:string,product:any};
+        const {table,product} = ctx.request.body as {table:Table,product:any};
         
         //Verify valid table access code, only user at a table can access this feature
-        const tableNum = await strapi.service("api::table.table").verify(table);
-        if(!tableNum)
-            throw new UnauthorizedError("Invalid Table number");
+        const tableID = await strapi.service("api::table.table").verify(table.accessCode,table.sessionCode);
+        if(!tableID)
+            throw new UnauthorizedError("Invalid table credential");
 
         //Preprocess product before creation
         const processedProd = await productPreprocessor(product);

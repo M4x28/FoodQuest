@@ -622,6 +622,7 @@ export interface ApiPartialOrderPartialOrder
   extends Struct.CollectionTypeSchema {
   collectionName: 'partial_orders';
   info: {
+    description: '';
     displayName: 'PartialOrder';
     pluralName: 'partial-orders';
     singularName: 'partial-order';
@@ -644,7 +645,7 @@ export interface ApiPartialOrderPartialOrder
       'api::partial-order.partial-order'
     >;
     order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
-    product: Schema.Attribute.Relation<'oneToOne', 'api::product.product'>;
+    product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     State: Schema.Attribute.Enumeration<['Pending', 'In Progress', 'Done']> &
       Schema.Attribute.Required &
@@ -708,8 +709,8 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    partial_order: Schema.Attribute.Relation<
-      'oneToOne',
+    partial_orders: Schema.Attribute.Relation<
+      'oneToMany',
       'api::partial-order.partial-order'
     >;
     Price: Schema.Attribute.Decimal &
@@ -749,6 +750,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
 export interface ApiTableTable extends Struct.CollectionTypeSchema {
   collectionName: 'tables';
   info: {
+    description: '';
     displayName: 'Table';
     pluralName: 'tables';
     singularName: 'table';
@@ -799,6 +801,12 @@ export interface ApiTableTable extends Struct.CollectionTypeSchema {
       >;
     orders: Schema.Attribute.Relation<'oneToMany', 'api::order.order'>;
     publishedAt: Schema.Attribute.DateTime;
+    SessionCode: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

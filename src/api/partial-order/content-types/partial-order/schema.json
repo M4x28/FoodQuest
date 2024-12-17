@@ -4,7 +4,8 @@
   "info": {
     "singularName": "partial-order",
     "pluralName": "partial-orders",
-    "displayName": "PartialOrder"
+    "displayName": "PartialOrder",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -32,9 +33,9 @@
     },
     "product": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::product.product",
-      "inversedBy": "partial_order"
+      "inversedBy": "partial_orders"
     },
     "users_permissions_user": {
       "type": "relation",

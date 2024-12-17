@@ -61,16 +61,16 @@
       "target": "api::category.category",
       "inversedBy": "products"
     },
-    "partial_order": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::partial-order.partial-order",
-      "mappedBy": "product"
-    },
     "ingredient_wrapper": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::ingredient-wrapper.ingredient-wrapper",
+      "mappedBy": "product"
+    },
+    "partial_orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::partial-order.partial-order",
       "mappedBy": "product"
     }
   }
