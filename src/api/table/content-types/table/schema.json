@@ -60,6 +60,15 @@
         }
       },
       "type": "string"
+    },
+    "Covers": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "min": 0
     }
   }
 }

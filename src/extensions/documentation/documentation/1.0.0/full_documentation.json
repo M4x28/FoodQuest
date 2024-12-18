@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-12-18T15:28:23.100Z"
+    "x-generation-date": "2024-12-18T16:05:54.774Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -6977,6 +6977,9 @@
                                         "SessionCode": {
                                           "type": "string"
                                         },
+                                        "Covers": {
+                                          "type": "integer"
+                                        },
                                         "createdAt": {
                                           "type": "string",
                                           "format": "date-time"
@@ -8802,6 +8805,9 @@
                               "SessionCode": {
                                 "type": "string"
                               },
+                              "Covers": {
+                                "type": "integer"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -10355,6 +10361,9 @@
                                               },
                                               "SessionCode": {
                                                 "type": "string"
+                                              },
+                                              "Covers": {
+                                                "type": "integer"
                                               },
                                               "createdAt": {
                                                 "type": "string",
@@ -12140,6 +12149,9 @@
                                         },
                                         "SessionCode": {
                                           "type": "string"
+                                        },
+                                        "Covers": {
+                                          "type": "integer"
                                         },
                                         "createdAt": {
                                           "type": "string",
@@ -14077,6 +14089,9 @@
                         "SessionCode": {
                           "type": "string"
                         },
+                        "Covers": {
+                          "type": "integer"
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -15756,6 +15771,9 @@
                             },
                             "SessionCode": {
                               "type": "string"
+                            },
+                            "Covers": {
+                              "type": "integer"
                             },
                             "createdAt": {
                               "type": "string",
@@ -17470,6 +17488,9 @@
                                   "SessionCode": {
                                     "type": "string"
                                   },
+                                  "Covers": {
+                                    "type": "integer"
+                                  },
                                   "createdAt": {
                                     "type": "string",
                                     "format": "date-time"
@@ -17865,6 +17886,9 @@
               },
               "SessionCode": {
                 "type": "string"
+              },
+              "Covers": {
+                "type": "integer"
               },
               "locale": {
                 "type": "string"
@@ -19374,6 +19398,9 @@
                     "SessionCode": {
                       "type": "string"
                     },
+                    "Covers": {
+                      "type": "integer"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -19483,6 +19510,9 @@
           },
           "SessionCode": {
             "type": "string"
+          },
+          "Covers": {
+            "type": "integer"
           },
           "createdAt": {
             "type": "string",
