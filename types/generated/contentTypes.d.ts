@@ -576,7 +576,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     singularName: 'order';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   pluginOptions: {
     i18n: {
@@ -602,7 +602,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     State: Schema.Attribute.Enumeration<
-      ['Pending', 'In Progress', 'Done', 'Paid']
+      ['New', 'Pending', 'In Progress', 'Done', 'Paid']
     > &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -610,7 +610,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }> &
-      Schema.Attribute.DefaultTo<'Pending'>;
+      Schema.Attribute.DefaultTo<'New'>;
     table: Schema.Attribute.Relation<'manyToOne', 'api::table.table'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -628,7 +628,7 @@ export interface ApiPartialOrderPartialOrder
     singularName: 'partial-order';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   pluginOptions: {
     i18n: {
@@ -647,14 +647,15 @@ export interface ApiPartialOrderPartialOrder
     order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
     product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
-    State: Schema.Attribute.Enumeration<['Pending', 'In Progress', 'Done']> &
-      Schema.Attribute.Required &
+    State: Schema.Attribute.Enumeration<
+      ['New', 'Pending', 'In Progress', 'Done']
+    > &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
         };
       }> &
-      Schema.Attribute.DefaultTo<'Pending'>;
+      Schema.Attribute.DefaultTo<'New'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -756,7 +757,7 @@ export interface ApiTableTable extends Struct.CollectionTypeSchema {
     singularName: 'table';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   pluginOptions: {
     i18n: {

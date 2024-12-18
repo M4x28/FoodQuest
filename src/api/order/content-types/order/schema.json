@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {
     "i18n": {
@@ -24,13 +24,14 @@
       },
       "type": "enumeration",
       "enum": [
+        "New",
         "Pending",
         "In Progress",
         "Done",
         "Paid"
       ],
       "required": true,
-      "default": "Pending"
+      "default": "New"
     },
     "Datetime": {
       "pluginOptions": {

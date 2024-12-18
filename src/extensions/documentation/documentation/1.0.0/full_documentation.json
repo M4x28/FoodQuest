@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-12-17T21:11:08.790Z"
+    "x-generation-date": "2024-12-18T15:28:23.100Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -6629,6 +6629,7 @@
                                 "State": {
                                   "type": "string",
                                   "enum": [
+                                    "New",
                                     "Pending",
                                     "In Progress",
                                     "Done"
@@ -6916,6 +6917,7 @@
                                     "State": {
                                       "type": "string",
                                       "enum": [
+                                        "New",
                                         "Pending",
                                         "In Progress",
                                         "Done",
@@ -8452,6 +8454,7 @@
                       "State": {
                         "type": "string",
                         "enum": [
+                          "New",
                           "Pending",
                           "In Progress",
                           "Done"
@@ -8739,6 +8742,7 @@
                           "State": {
                             "type": "string",
                             "enum": [
+                              "New",
                               "Pending",
                               "In Progress",
                               "Done",
@@ -10004,6 +10008,7 @@
                                       "State": {
                                         "type": "string",
                                         "enum": [
+                                          "New",
                                           "Pending",
                                           "In Progress",
                                           "Done"
@@ -10291,6 +10296,7 @@
                                           "State": {
                                             "type": "string",
                                             "enum": [
+                                              "New",
                                               "Pending",
                                               "In Progress",
                                               "Done",
@@ -11787,6 +11793,7 @@
                                 "State": {
                                   "type": "string",
                                   "enum": [
+                                    "New",
                                     "Pending",
                                     "In Progress",
                                     "Done"
@@ -12074,6 +12081,7 @@
                                     "State": {
                                       "type": "string",
                                       "enum": [
+                                        "New",
                                         "Pending",
                                         "In Progress",
                                         "Done",
@@ -12574,6 +12582,7 @@
               "State": {
                 "type": "string",
                 "enum": [
+                  "New",
                   "Pending",
                   "In Progress",
                   "Done",
@@ -12681,6 +12690,7 @@
           "State": {
             "type": "string",
             "enum": [
+              "New",
               "Pending",
               "In Progress",
               "Done",
@@ -12705,6 +12715,7 @@
                 "State": {
                   "type": "string",
                   "enum": [
+                    "New",
                     "Pending",
                     "In Progress",
                     "Done"
@@ -14006,6 +14017,7 @@
                     "State": {
                       "type": "string",
                       "enum": [
+                        "New",
                         "Pending",
                         "In Progress",
                         "Done",
@@ -14307,14 +14319,12 @@
         ],
         "properties": {
           "data": {
-            "required": [
-              "State"
-            ],
             "type": "object",
             "properties": {
               "State": {
                 "type": "string",
                 "enum": [
+                  "New",
                   "Pending",
                   "In Progress",
                   "Done"
@@ -14411,9 +14421,6 @@
       },
       "PartialOrder": {
         "type": "object",
-        "required": [
-          "State"
-        ],
         "properties": {
           "id": {
             "type": "number"
@@ -14424,6 +14431,7 @@
           "State": {
             "type": "string",
             "enum": [
+              "New",
               "Pending",
               "In Progress",
               "Done"
@@ -15401,6 +15409,7 @@
                     "State": {
                       "type": "string",
                       "enum": [
+                        "New",
                         "Pending",
                         "In Progress",
                         "Done"
@@ -15688,6 +15697,7 @@
                         "State": {
                           "type": "string",
                           "enum": [
+                            "New",
                             "Pending",
                             "In Progress",
                             "Done",
@@ -17112,6 +17122,7 @@
                           "State": {
                             "type": "string",
                             "enum": [
+                              "New",
                               "Pending",
                               "In Progress",
                               "Done"
@@ -17399,6 +17410,7 @@
                               "State": {
                                 "type": "string",
                                 "enum": [
+                                  "New",
                                   "Pending",
                                   "In Progress",
                                   "Done",
@@ -17947,6 +17959,7 @@
                 "State": {
                   "type": "string",
                   "enum": [
+                    "New",
                     "Pending",
                     "In Progress",
                     "Done",
@@ -17971,6 +17984,7 @@
                       "State": {
                         "type": "string",
                         "enum": [
+                          "New",
                           "Pending",
                           "In Progress",
                           "Done"
