@@ -55,15 +55,7 @@ export default factories.createCoreService('api::partial-order.partial-order', (
             throw new Error('Ordine o Tavolo non trovato');
         }
 
-        const totalPartialOrders = order.partial_orders.length;
-        const tableCovers = table.Covers || 0;
 
-        if (totalPartialOrders >= tableCovers && tableCovers > 0) {
-            await strapi.documents('api::order.order').update({
-                documentId: orderID,
-                data: { State: OrderState.Pending }
-            });
-        }
     },
 }));
 

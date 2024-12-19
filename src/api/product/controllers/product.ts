@@ -4,7 +4,6 @@
 
 import { factories } from '@strapi/strapi'
 import { errors } from '@strapi/utils';
-import { ProductIngredientDetail } from '../services/product';
 import productPreprocessor from './productPreprocessor';
 
 const { ApplicationError, UnauthorizedError } = errors;

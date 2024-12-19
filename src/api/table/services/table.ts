@@ -3,6 +3,7 @@
  */
 
 import { factories } from '@strapi/strapi';
+import { ApiTableTable } from '../../../../types/generated/contentTypes';
 
 export default factories.createCoreService('api::table.table', ( ({strapi}) => ({
 
@@ -19,6 +20,15 @@ export default factories.createCoreService('api::table.table', ( ({strapi}) => (
         });
 
         return table ? table.documentId : null;
+    },
+
+    //Get table info from the accessCode
+    async getTable(accessCode:string){
+        return strapi.documents('api::table.table').findFirst({
+            filters: {
+                AccessCode: accessCode,
+            }
+        });
     }
 
 })
