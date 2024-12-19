@@ -469,7 +469,7 @@ export interface ApiGuestGuest extends Struct.CollectionTypeSchema {
     singularName: 'guest';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -697,7 +697,7 @@ export interface ApiPartialOrderPartialOrder
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     users_permissions_user: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
   };
@@ -1405,7 +1405,6 @@ export interface PluginUsersPermissionsUser
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -1425,8 +1424,8 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
-    partial_order: Schema.Attribute.Relation<
-      'oneToOne',
+    partial_orders: Schema.Attribute.Relation<
+      'oneToMany',
       'api::partial-order.partial-order'
     >;
     password: Schema.Attribute.Password &

@@ -9,7 +9,7 @@
     "displayName": "User"
   },
   "options": {
-    "timestamps": true
+    "draftAndPublish": false
   },
   "attributes": {
     "username": {
@@ -65,17 +65,17 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "partial_order": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::partial-order.partial-order",
-      "mappedBy": "users_permissions_user"
-    },
     "product_share_request": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::product-share-request.product-share-request",
       "inversedBy": "users_permissions_users"
+    },
+    "partial_orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::partial-order.partial-order",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

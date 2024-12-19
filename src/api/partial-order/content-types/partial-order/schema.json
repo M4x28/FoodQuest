@@ -38,12 +38,6 @@
       "target": "api::product.product",
       "inversedBy": "partial_orders"
     },
-    "users_permissions_user": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "partial_order"
-    },
     "order": {
       "type": "relation",
       "relation": "manyToOne",
@@ -54,6 +48,12 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::guest.guest",
+      "inversedBy": "partial_orders"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
       "inversedBy": "partial_orders"
     }
   }

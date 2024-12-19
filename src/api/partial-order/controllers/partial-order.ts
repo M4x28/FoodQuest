@@ -1,49 +1,27 @@
-/**
- * partial-order controller
- */
-
+// Controller per la gestione degli ordini parziali
 import { factories } from '@strapi/strapi';
 
 export default factories.createCoreController('api::partial-order.partial-order', ({ strapi }) => ({
 
     async create(ctx) {
-        const { productID, users_permissions_user, tableID } = ctx.request.body.data;
-
-        // Verifica che i campi obbligatori siano presenti
-        const requiredFields = [productID, users_permissions_user, tableID];
-
-        if (requiredFields.some(field => typeof field !== 'string' || !field.trim())) {
-            return ctx.badRequest('Campi mancanti o non validi');
-        }
-
         try {
-            // Verifica che il prodotto esista
-            const product = await strapi.documents('api::product.product').findOne({ documentId: productID });
-            if (!product) {
-                return ctx.notFound('Prodotto non trovato');
+            const { productID, tableID, users_permissions_user } = ctx.request.body.data;
+
+            if (!productID || !tableID) {
+                return ctx.badRequest('ID del prodotto o del tavolo mancante');
             }
 
-            // Verifica che l'utente esista
-            const user = await strapi.documents('plugin::users-permissions.user').findOne({ documentId: users_permissions_user });
-            if (!user) {
-                return ctx.notFound('Utente non trovato');
-            }
+            console.log('Creazione ordine parziale con:', { productID, tableID, users_permissions_user });
 
-            // Verifica che il tavolo esista
-            const table = await strapi.documents('api::table.table').findOne({ documentId: tableID });
-            if (!table) {
-                return ctx.notFound('Tavolo non trovato');
-            }
-
-            // Elabora la richiesta tramite il service
+            // Crea l'ordine parziale usando il servizio
             const partialOrderService = strapi.service('api::partial-order.partial-order');
-            const partialOrder = await partialOrderService.addPartialOrder(productID, users_permissions_user, tableID);
+            const partialOrder = await partialOrderService.addPartialOrder(productID, tableID, users_permissions_user);
 
-            return ctx.created(partialOrder);
+            return ctx.created({ message: 'Ordine parziale creato con successo', data: partialOrder });
         } catch (error) {
-            strapi.log.error("Errore durante la creazione dell'ordine parziale", error);
-            return ctx.internalServerError('Errore del server');
+            console.error('Errore durante la creazione dell ordine parziale: ', error);
+            return ctx.internalServerError('Errore del server durante la creazione dellordine parziale');
         }
-    },
+    }
 
 }));

@@ -5,25 +5,25 @@
 import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 
-const { ApplicationError, UnauthorizedError} = errors;
+const { ApplicationError, UnauthorizedError } = errors;
 
-export default factories.createCoreController('api::table.table',(({strapi}) => ({
+export default factories.createCoreController('api::table.table', (({ strapi }) => ({
 
     async accessTable(ctx) {
-        
-        if(!ctx.params || !ctx.params.accessCode){
+
+        if (!ctx.params || !ctx.params.accessCode) {
             throw new ApplicationError("Missing parameter in query");
         }
 
-        const {accessCode} = ctx.params;
+        const { accessCode } = ctx.params;
 
         const table = await strapi.service('api::table.table').getTable(accessCode);
-        
-        if(!table || table.CheckRequest){
+
+        if (!table || table.CheckRequest) {
             throw new UnauthorizedError("No valid table found");
         }
 
-        return { 
+        return {
             data: {
                 number: table.Number,
                 sessionCode: table.SessionCode,
@@ -32,16 +32,16 @@ export default factories.createCoreController('api::table.table',(({strapi}) => 
     },
 
     async tableStatus(ctx) {
-        
-        if(!ctx.params || !ctx.params.accessCode || !ctx.params.sessionCode){
+
+        if (!ctx.params || !ctx.params.accessCode || !ctx.params.sessionCode) {
             throw new ApplicationError("Missing parameter in query");
         }
 
-        const {accessCode, sessionCode} = ctx.params;
+        const { accessCode, sessionCode } = ctx.params;
 
         const table = await strapi.service('api::table.table').getTable(accessCode);
-        
-        if(!table){
+
+        if (!table) {
             throw new UnauthorizedError("No valid table found");
         }
 
