@@ -72,6 +72,12 @@
       "relation": "oneToMany",
       "target": "api::partial-order.partial-order",
       "mappedBy": "product"
+    },
+    "product_share_requests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-share-request.product-share-request",
+      "mappedBy": "product"
     }
   }
 }

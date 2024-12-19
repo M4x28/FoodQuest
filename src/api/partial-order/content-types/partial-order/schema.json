@@ -49,6 +49,12 @@
       "relation": "manyToOne",
       "target": "api::order.order",
       "inversedBy": "partial_orders"
+    },
+    "guest": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::guest.guest",
+      "inversedBy": "partial_orders"
     }
   }
 }

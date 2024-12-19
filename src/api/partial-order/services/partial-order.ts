@@ -1,5 +1,5 @@
 /**
- * partial-order service aggiornato con controllo stato ordine
+ * partial-order service aggiornato per supportare utenti guest e controllo stato ordine
  */
 
 import { factories } from '@strapi/strapi';
@@ -15,7 +15,7 @@ enum OrderState {
 
 export default factories.createCoreService('api::partial-order.partial-order', ({ strapi }) => ({
 
-    async addPartialOrder(productID: string, users_permissions_user: string, tableID: string) {
+    async addPartialOrder(productID: string, tableID: string, users_permissions_user?: string) {
         // Trova o crea un ordine
         const orderService = strapi.service('api::order.order');
         let orderID;
@@ -25,13 +25,38 @@ export default factories.createCoreService('api::partial-order.partial-order', (
             orderID = await orderService.createOrder(tableID, OrderState.New);
         }
 
-        // Crea un ordine parziale
-        const partialOrder = await strapi.documents('api::partial-order.partial-order').create({
-            data: {
-                product: { documentId: productID },
-                order: { documentId: orderID },
-                users_permissions_user: { documentId: users_permissions_user },
+        // Trova o crea un utente guest associato al tavolo
+        let guest = await strapi.documents('api::guest.guest').findMany({
+            filters: {
+                SessionCode: {
+                    $eq: tableID
+                }
             },
+            limit: 1
+        });
+
+        if (guest.length === 0) {
+            guest = [await strapi.documents('api::guest.guest').create({
+                data: {
+                    SessionCode: tableID
+                }
+            })];
+        }
+
+        // Crea un ordine parziale
+        const partialOrderData: any = {
+            product: { documentId: productID },
+            order: { documentId: orderID },
+        };
+
+        if (users_permissions_user) {
+            partialOrderData.users_permissions_user = { documentId: users_permissions_user };
+        } else {
+            partialOrderData.guest = { documentId: guest[0].documentId };
+        }
+
+        const partialOrder = await strapi.documents('api::partial-order.partial-order').create({
+            data: partialOrderData
         });
 
         // Controlla se aggiornare lo stato dell'ordine
@@ -66,4 +91,3 @@ export default factories.createCoreService('api::partial-order.partial-order', (
         }
     },
 }));
-

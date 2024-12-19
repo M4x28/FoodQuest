@@ -53,6 +53,12 @@
       "relation": "manyToOne",
       "target": "api::table.table",
       "inversedBy": "orders"
+    },
+    "guest": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::guest.guest",
+      "inversedBy": "orders"
     }
   }
 }

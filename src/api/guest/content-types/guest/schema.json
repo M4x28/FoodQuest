@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "guests",
+  "info": {
+    "singularName": "guest",
+    "pluralName": "guests",
+    "displayName": "Guest",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "SessionCode": {
+      "type": "string"
+    },
+    "orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::order.order",
+      "mappedBy": "guest"
+    },
+    "product_share_requests": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-share-request.product-share-request",
+      "inversedBy": "guests"
+    },
+    "partial_orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::partial-order.partial-order",
+      "mappedBy": "guest"
+    }
+  }
+}

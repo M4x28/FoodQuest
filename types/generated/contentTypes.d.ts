@@ -460,6 +460,41 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiGuestGuest extends Struct.CollectionTypeSchema {
+  collectionName: 'guests';
+  info: {
+    description: '';
+    displayName: 'Guest';
+    pluralName: 'guests';
+    singularName: 'guest';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::guest.guest'> &
+      Schema.Attribute.Private;
+    orders: Schema.Attribute.Relation<'oneToMany', 'api::order.order'>;
+    partial_orders: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::partial-order.partial-order'
+    >;
+    product_share_requests: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::product-share-request.product-share-request'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    SessionCode: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiIngredientWrapperIngredientWrapper
   extends Struct.CollectionTypeSchema {
   collectionName: 'ingredient_wrappers';
@@ -594,6 +629,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    guest: Schema.Attribute.Relation<'manyToOne', 'api::guest.guest'>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'>;
     partial_orders: Schema.Attribute.Relation<
@@ -639,6 +675,7 @@ export interface ApiPartialOrderPartialOrder
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    guest: Schema.Attribute.Relation<'manyToOne', 'api::guest.guest'>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -661,6 +698,42 @@ export interface ApiPartialOrderPartialOrder
       Schema.Attribute.Private;
     users_permissions_user: Schema.Attribute.Relation<
       'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiProductShareRequestProductShareRequest
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'product_share_requests';
+  info: {
+    displayName: 'ProductShareRequest';
+    pluralName: 'product-share-requests';
+    singularName: 'product-share-request';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    guests: Schema.Attribute.Relation<'manyToMany', 'api::guest.guest'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product-share-request.product-share-request'
+    > &
+      Schema.Attribute.Private;
+    product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
+    publishedAt: Schema.Attribute.DateTime;
+    State: Schema.Attribute.Enumeration<['Pending', 'Accepted', 'Declined']>;
+    table: Schema.Attribute.Relation<'manyToOne', 'api::table.table'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users_permissions_users: Schema.Attribute.Relation<
+      'oneToMany',
       'plugin::users-permissions.user'
     >;
   };
@@ -727,6 +800,10 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
         },
         number
       >;
+    product_share_requests: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product-share-request.product-share-request'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     TimeToPrepare: Schema.Attribute.Integer &
       Schema.Attribute.Required &
@@ -813,6 +890,10 @@ export interface ApiTableTable extends Struct.CollectionTypeSchema {
         number
       >;
     orders: Schema.Attribute.Relation<'oneToMany', 'api::order.order'>;
+    product_share_requests: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product-share-request.product-share-request'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     SessionCode: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
@@ -1353,6 +1434,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    product_share_request: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::product-share-request.product-share-request'
+    >;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
@@ -1384,10 +1469,12 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::allergen.allergen': ApiAllergenAllergen;
       'api::category.category': ApiCategoryCategory;
+      'api::guest.guest': ApiGuestGuest;
       'api::ingredient-wrapper.ingredient-wrapper': ApiIngredientWrapperIngredientWrapper;
       'api::ingredient.ingredient': ApiIngredientIngredient;
       'api::order.order': ApiOrderOrder;
       'api::partial-order.partial-order': ApiPartialOrderPartialOrder;
+      'api::product-share-request.product-share-request': ApiProductShareRequestProductShareRequest;
       'api::product.product': ApiProductProduct;
       'api::table.table': ApiTableTable;
       'plugin::content-releases.release': PluginContentReleasesRelease;

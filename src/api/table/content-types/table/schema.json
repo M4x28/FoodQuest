@@ -69,6 +69,12 @@
       },
       "type": "integer",
       "min": 0
+    },
+    "product_share_requests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-share-request.product-share-request",
+      "mappedBy": "table"
     }
   }
 }
