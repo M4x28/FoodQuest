@@ -1,10 +1,7 @@
-/**
- * partial-order service aggiornato con controllo stato ordine
- */
-
+// Servizio per la gestione degli ordini parziali
 import { factories } from '@strapi/strapi';
 
-// Definizione del tipo enumerazione per lo stato dell'ordine
+// Enumerazione degli stati dell'ordine
 enum OrderState {
     New = 'New',
     Pending = 'Pending',
@@ -15,33 +12,59 @@ enum OrderState {
 
 export default factories.createCoreService('api::partial-order.partial-order', ({ strapi }) => ({
 
-    async addPartialOrder(productID: string, users_permissions_user: string, tableID: string) {
-        // Trova o crea un ordine
+    /**
+     * Crea un ordine parziale associando un ordine totale esistente o creandone uno nuovo
+     * @param productID - documentId del prodotto
+     * @param tableID - documentId del tavolo
+     * @param users_permissions_user - documentId dell'utente registrato
+     * @returns L'ordine parziale creato
+     */
+    async addPartialOrder(productID: string, tableID: string, users_permissions_user: string) {
         const orderService = strapi.service('api::order.order');
         let orderID;
-        try {
-            orderID = await orderService.findOrderByTableID(tableID);
-        } catch {
-            orderID = await orderService.createOrder(tableID, OrderState.New);
-        }
 
-        // Crea un ordine parziale
-        const partialOrder = await strapi.documents('api::partial-order.partial-order').create({
-            data: {
+        try {
+            console.log('Verifica ordine totale esistente...');
+            orderID = await orderService.findOrderByTableID(tableID);
+
+            if (!orderID) {
+                console.log('Creazione nuovo ordine totale...');
+                orderID = await orderService.createOrder(tableID, OrderState.New);
+                console.log('Nuovo ordine totale creato:', orderID);
+            }
+
+            const partialOrderData: Record<string, any> = {
                 product: { documentId: productID },
                 order: { documentId: orderID },
-                users_permissions_user: { documentId: users_permissions_user },
-            },
-        });
+                users_permissions_user: { documentId: users_permissions_user }
+            };
 
-        // Controlla se aggiornare lo stato dell'ordine
-        await this.checkAndUpdateOrderState(orderID, tableID);
+            console.log('Dati ordine parziale preparati:', partialOrderData);
 
-        return partialOrder;
+            const partialOrder = await strapi.documents('api::partial-order.partial-order').create({
+                data: partialOrderData
+            });
+
+            console.log('Ordine parziale creato:', partialOrder);
+
+            await this.checkAndUpdateOrderState(orderID, tableID);
+
+            return partialOrder;
+
+        } catch (error) {
+            console.error("Errore durante la creazione dell'ordine parziale: ", error);
+            throw new Error('Errore del server');
+        }
     },
 
-    // Verifica e aggiorna lo stato dell'ordine se necessario
+    /**
+     * Verifica se l'ordine deve passare allo stato "Pending"
+     * @param orderID - documentId dell'ordine totale
+     * @param tableID - documentId del tavolo
+     */
     async checkAndUpdateOrderState(orderID: string, tableID: string): Promise<void> {
+        console.log('Verifica stato ordine totale...');
+
         const order = await strapi.documents('api::order.order').findOne({
             documentId: orderID,
             populate: ['partial_orders']
@@ -52,10 +75,8 @@ export default factories.createCoreService('api::partial-order.partial-order', (
         });
 
         if (!order || !table) {
+            console.error('Ordine o Tavolo non trovato');
             throw new Error('Ordine o Tavolo non trovato');
         }
-
-
     },
 }));
-

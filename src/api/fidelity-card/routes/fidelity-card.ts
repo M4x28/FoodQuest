@@ -1,0 +1,7 @@
+/**
+ * fidelity-card router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::fidelity-card.fidelity-card');

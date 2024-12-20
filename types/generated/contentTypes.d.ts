@@ -460,6 +460,48 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiFidelityCardFidelityCard
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'fidelity_cards';
+  info: {
+    description: '';
+    displayName: 'FidelityCard';
+    pluralName: 'fidelity-cards';
+    singularName: 'fidelity-card';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Datetime: Schema.Attribute.DateTime;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::fidelity-card.fidelity-card'
+    > &
+      Schema.Attribute.Private;
+    Points: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users_permissions_user: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiIngredientWrapperIngredientWrapper
   extends Struct.CollectionTypeSchema {
   collectionName: 'ingredient_wrappers';
@@ -630,31 +672,22 @@ export interface ApiPartialOrderPartialOrder
   options: {
     draftAndPublish: false;
   };
-  pluginOptions: {
-    i18n: {
-      localized: true;
-    };
-  };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    locale: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::partial-order.partial-order'
-    >;
+    > &
+      Schema.Attribute.Private;
     order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
     product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     State: Schema.Attribute.Enumeration<
       ['New', 'Pending', 'In Progress', 'Done']
     > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }> &
       Schema.Attribute.DefaultTo<'New'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1338,6 +1371,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    fidelity_card: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::fidelity-card.fidelity-card'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1384,6 +1421,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::allergen.allergen': ApiAllergenAllergen;
       'api::category.category': ApiCategoryCategory;
+      'api::fidelity-card.fidelity-card': ApiFidelityCardFidelityCard;
       'api::ingredient-wrapper.ingredient-wrapper': ApiIngredientWrapperIngredientWrapper;
       'api::ingredient.ingredient': ApiIngredientIngredient;
       'api::order.order': ApiOrderOrder;

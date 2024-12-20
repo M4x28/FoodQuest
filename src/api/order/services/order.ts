@@ -1,11 +1,7 @@
-/**
- * order service aggiornato usando strapi.document() con enumerazione State
- */
-
+// Servizio per la gestione degli ordini totali
 import { factories } from '@strapi/strapi';
 
-// Definizione del tipo enumerazione per lo stato dell'ordine
-// Se modifichi questo modifica anche schema.json
+// Enumerazione degli stati dell'ordine
 enum OrderState {
     New = 'New',
     Pending = 'Pending',
@@ -16,44 +12,62 @@ enum OrderState {
 
 export default factories.createCoreService('api::order.order', ({ strapi }) => ({
 
-    // Controlla se l'ordine è modificabile
-    async isEditable(orderID: string): Promise<boolean> {
-        const order = await strapi.documents('api::order.order').findOne({ documentId: orderID });
-        return order?.State === OrderState.New;
-    },
-
-    // Trova un ordine aperto associato a un tavolo
+    /**
+     * Trova un ordine associato al tavolo
+     * @param tableID - ID del tavolo
+     * @returns ID dell'ordine o false se non esiste
+     */
     async findOrderByTableID(tableID: string): Promise<string | false> {
         const order = await strapi.documents('api::order.order').findMany({
-            filters: { table: { documentId: tableID }, State: OrderState.New },
-            populate: ['table'],
+            filters: {
+                table: { documentId: tableID },
+                State: OrderState.New
+            },
             limit: 1
         });
 
-        if (order.length > 0) {
-            return order[0].documentId;
-        }
-        return false;
+        return order.length > 0 ? order[0].documentId : false;
     },
 
-    // Crea un nuovo ordine
+    /**
+     * Crea un nuovo ordine associato a un tavolo
+     * @param tableID - documentId del tavolo
+     * @param state - Stato iniziale dell'ordine
+     * @returns ID dell'ordine creato
+     */
     async createOrder(tableID: string, state: OrderState): Promise<string> {
         const order = await strapi.documents('api::order.order').create({
             data: {
                 table: { documentId: tableID },
                 State: state,
-                Datetime: new Date().toISOString(),
-            },
+                Datetime: new Date().toISOString()
+            }
         });
+
+        console.log('Ordine totale creato:', order);
         return order.documentId;
     },
 
-    // Trova o crea un ordine
-    async findOrCreateOrder(tableID: string): Promise<string> {
-        const order = await this.findOrderByTableID(tableID);
-        if (order !== false) {
-            return order;
+
+     /**
+     * Conferma un ordine esistente cambiando lo stato da "New" a "Pending"
+     * @param orderID - documentId dell'ordine totale da confermare
+     */
+    async confirmOrder(orderID: string): Promise<boolean> {
+        const order = await strapi.documents('api::order.order').findOne({
+            documentId: orderID
+        });
+
+        if (!order || order.State !== OrderState.New) {
+            throw new Error('Ordine non trovato o già confermato');
         }
-        return await this.createOrder(tableID, OrderState.New);
-    },
+
+        await strapi.documents('api::order.order').update({
+            documentId: orderID,
+            data: { State: OrderState.Pending }
+        });
+
+        return true;
+    }
+
 }));
