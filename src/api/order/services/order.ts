@@ -1,8 +1,9 @@
 // Servizio per la gestione degli ordini totali
 import { factories } from '@strapi/strapi';
+import product from '../../product/services/product';
 
 // Enumerazione degli stati dell'ordine
-enum OrderState {
+export enum OrderState {
     New = 'New',
     Pending = 'Pending',
     InProgress = 'In Progress',
@@ -62,12 +63,142 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
             throw new Error('Ordine non trovato o già confermato');
         }
 
+        //Calculating Time and time to service
+        const time = await this.calculatePrepTime(orderID);
+        const previousOrder = await this.getOrderBefore(new Date().toISOString());
+        const tts = time + (previousOrder ? previousOrder.TimeToService : 0);
+
         await strapi.documents('api::order.order').update({
             documentId: orderID,
-            data: { State: OrderState.Pending }
+            data: {
+                Datetime: new Date().toISOString(), 
+                State: OrderState.Pending,
+                PreparationTime: time,
+                TimeToService: tts,
+            }
         });
 
         return true;
+    },
+
+    //Calculate Preparation Time of new order
+    async calculatePrepTime(orderID:string):Promise<number>{
+        
+        const categoryMap:Map<string,number> = new Map<string,number>();
+
+        //Get all products in the order and their category
+        const products = await strapi.documents("api::product.product").findMany({
+            filters:{
+                partial_orders:{
+                    State:{
+                        $not:"Pending"
+                    },
+                    order:{
+                        documentId: orderID
+                    },
+                }
+            },
+            populate:["category"]
+        });
+
+        //Getting the product with the longest time to prepare for each category
+        products.forEach((product) => {
+            const category = product.category.documentId;
+            const time = product.TimeToPrepare;
+
+            console.log("Product: ", product.Name, "Time: ", time);
+
+            if(categoryMap.has(category)){
+                if(categoryMap.get(category) < time){
+                    categoryMap.set(category,time);
+                }
+            }else{
+                categoryMap.set(category,time);
+            }
+        });
+
+        //Sum times
+        const prepTime:number = Array.from(categoryMap.values()).reduce((x,y) => x+y,0);
+        console.log("Preparation Time: ",prepTime);
+        return prepTime;
+    },
+
+    //Get the order right before order made in time: isoDate
+    async getOrderBefore(isoDate:string){
+        
+        return strapi.documents("api::order.order").findFirst({
+            filters:{
+                Datetime:{
+                    $lt:isoDate
+                },
+                State:{
+                    $not: OrderState.New,
+                }
+            },
+            sort:[
+                {
+                    Datetime: "desc"
+                }
+            ]
+        })
+    },
+
+    //Change the time of all order after isoDate
+    async editOrderAfter(isoDate:string, timeChange: number) {
+        
+        //Find all orders made after isoDate
+        const orders = await strapi.documents("api::order.order").findMany(
+            {
+                filters:{
+                    Datetime:{
+                        $gt: isoDate
+                    },
+                    State:{
+                        $not: OrderState.New,
+                    }
+                }
+            }
+        )
+
+        //Updating time of all found order by timeChange
+        Promise.all(
+            orders.map((order) => (
+                strapi.documents("api::order.order").update(
+                {
+                    documentId: order.documentId,
+                    data:{
+                        TimeToService:order.TimeToService + timeChange,
+                    }
+                })
+            ))
+        )
+    },
+
+    async closeAllpartialOrder(orderID:string){
+        //Fetch all non done partial in order
+        const partial = await strapi.documents("api::partial-order.partial-order").findMany({
+            filters:{
+                State:{
+                    $not: "Done"
+                },
+                order: {
+                    documentId: orderID
+                }
+            }
+        });
+
+        //Update all in parallel
+        Promise.all(
+            partial.map(po => (
+                strapi.documents("api::partial-order.partial-order").update({
+                    documentId:po.documentId,
+                    data:{
+                        State: "Done"
+                    }
+                })
+            ))
+        )
+
     }
 
 }));

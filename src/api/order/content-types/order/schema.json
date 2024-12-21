@@ -53,6 +53,23 @@
       "relation": "manyToOne",
       "target": "api::table.table",
       "inversedBy": "orders"
+    },
+    "PreparationTime": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": 0,
+      "type": "integer"
+    },
+    "TimeToService": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "integer"
     }
   }
 }

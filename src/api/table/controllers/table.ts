@@ -45,7 +45,13 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
             throw new UnauthorizedError("No valid table found");
         }
 
-        return (table.SessionCode === sessionCode && !table.CheckRequest) ? "OK" : "CLOSED";
+        if(table.SessionCode != sessionCode ){
+            return "EXPIRED";
+        }else if(table.CheckRequest){
+            return "CHECK";
+        }else{
+            return "OK";
+        }
     },
 
     /**

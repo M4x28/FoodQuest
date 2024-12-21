@@ -65,16 +65,16 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "partial_order": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::partial-order.partial-order",
-      "mappedBy": "users_permissions_user"
-    },
     "fidelity_card": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::fidelity-card.fidelity-card",
+      "mappedBy": "users_permissions_user"
+    },
+    "partial_orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::partial-order.partial-order",
       "mappedBy": "users_permissions_user"
     }
   }

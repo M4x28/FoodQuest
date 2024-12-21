@@ -642,6 +642,13 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::partial-order.partial-order'
     >;
+    PreparationTime: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
     State: Schema.Attribute.Enumeration<
       ['New', 'Pending', 'In Progress', 'Done', 'Paid']
@@ -654,6 +661,12 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       }> &
       Schema.Attribute.DefaultTo<'New'>;
     table: Schema.Attribute.Relation<'manyToOne', 'api::table.table'>;
+    TimeToService: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -693,7 +706,7 @@ export interface ApiPartialOrderPartialOrder
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     users_permissions_user: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
   };
@@ -1381,8 +1394,8 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
-    partial_order: Schema.Attribute.Relation<
-      'oneToOne',
+    partial_orders: Schema.Attribute.Relation<
+      'oneToMany',
       'api::partial-order.partial-order'
     >;
     password: Schema.Attribute.Password &
