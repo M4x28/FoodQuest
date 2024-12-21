@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-12-20T11:11:08.255Z"
+    "x-generation-date": "2024-12-21T16:03:27.616Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -6052,8 +6052,7 @@
         "properties": {
           "data": {
             "required": [
-              "Name",
-              "Icon"
+              "Name"
             ],
             "type": "object",
             "properties": {
@@ -6144,8 +6143,7 @@
       "Allergen": {
         "type": "object",
         "required": [
-          "Name",
-          "Icon"
+          "Name"
         ],
         "properties": {
           "id": {
