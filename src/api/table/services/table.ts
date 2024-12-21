@@ -3,13 +3,12 @@
  */
 
 import { factories } from '@strapi/strapi';
-import { ApiTableTable } from '../../../../types/generated/contentTypes';
 
-export default factories.createCoreService('api::table.table', ( ({strapi}) => ({
+export default factories.createCoreService('api::table.table', (({ strapi }) => ({
 
     //Verify access to table with AccessCode <accessCode> and SessionCode <sessionCode>
     //Return Table number if found or null if not 
-    async verify(accessCode:string,sessionCode:string): Promise<string|null>{
+    async verify(accessCode: string, sessionCode: string): Promise<string | null> {
 
         const table = await strapi.documents('api::table.table').findFirst({
             filters: {
@@ -23,7 +22,7 @@ export default factories.createCoreService('api::table.table', ( ({strapi}) => (
     },
 
     //Get table info from the accessCode
-    async getTable(accessCode:string){
+    async getTable(accessCode: string) {
         return strapi.documents('api::table.table').findFirst({
             filters: {
                 AccessCode: accessCode,
@@ -53,5 +52,4 @@ export default factories.createCoreService('api::table.table', ( ({strapi}) => (
         }
     }
 
-})
-));
+})));
