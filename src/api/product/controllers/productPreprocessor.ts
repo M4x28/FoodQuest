@@ -49,29 +49,38 @@ async function processPizza(product: any):Promise<ProductIngredientDetail|null> 
         return null;
     }
 
-    //Checking base validity and ingredients validity in parallel 
-    let [validBase,validIg] = await Promise.all([
+    //Checking ingredients detail
+    let [base,ingredients] = await Promise.all([
         //Check Base
         strapi.documents("api::ingredient.ingredient").findOne(
             {
                 documentId: product.baseID,
-                fields: ["Type"],
+                fields: ["Type","Price"],
             }
-        ).then((baseIg) => (baseIg ? baseIg.Type == "pizza-base" : false)),
+        ),
         //Check Ingredients
         strapi.documents("api::ingredient.ingredient").findMany(
             {
-                fields: ["Type"],
+                fields: ["Type","Price"],
                 filters:{
                     documentId:product.ingredientsID,
                 },
             }
-        ).then((igList) => (igList.filter(({Type}) => Type == "pizza-base").length == 0))
+        )
     ]);
 
+    //Validate Ingredient, Only base must be of type pizza base
+    const validBase = base ? base.Type === "pizza-base" : false;
+    const validIg = ingredients.length > 0 && ingredients.filter((i) => i.Type === "pizza-base").length === 0;
+
     if(validBase && validIg){
+        //Calculate Price
+        let price:number = base.Price;
+        price += ingredients.reduce((tot,prod) => tot + prod.Price,0);
         //Merging base within the ingredients
         return {
+            name: "Custom",
+            price: price,
             categoryID:product.categoryID, 
             ingredientsID:[product.baseID,...product.ingredientsID]
         };

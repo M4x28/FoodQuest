@@ -45,6 +45,12 @@
       "relation": "manyToMany",
       "target": "api::ingredient.ingredient",
       "mappedBy": "allergens"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product.product",
+      "mappedBy": "allergens"
     }
   }
 }

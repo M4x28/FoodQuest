@@ -6,6 +6,8 @@ import { factories } from '@strapi/strapi';
 
 export interface ProductIngredientDetail{
     categoryID:string,
+    price:number
+    name:string
     ingredientsID:string[];
 }
 
@@ -13,17 +15,13 @@ export default factories.createCoreService('api::product.product',(({strapi}) =>
 
     async createIgProduct(product:ProductIngredientDetail):Promise<string> {
 
-        //Catch missing input
-        if(!product.categoryID || !product.ingredientsID){
-            return null;
-        }
+        console.log("Creating Product",product);
 
         const targetProduct:string|null = await this.findProductFromIngredient(product);
 
         if(targetProduct){
             return targetProduct;
         } else { 
-            console.log("3");
             return await productFactory(product);
         }
     },
@@ -81,6 +79,21 @@ export async function ingredientsPrice(ingredientsID:string[]):Promise<number> {
         .reduce((total,price) => (total + price), 0);
 }
 
+export async function ingredientsAllergen(ingredientsID:string[]):Promise<string[]>{
+    const result = await strapi.documents("api::allergen.allergen").findMany({
+        filters:{
+            ingredients:{
+                documentId:{
+                    $in: ingredientsID,
+                }
+            }
+        }
+    });
+
+    return result.map(allergen => allergen.documentId);
+}
+
+//Create the product
 export async function productFactory(product:ProductIngredientDetail):Promise<string>{
 
     //Create both new Wrapper and new Product in parallel
@@ -96,16 +109,17 @@ export async function productFactory(product:ProductIngredientDetail):Promise<st
         }),
         
         //Create Product
-        //Before creatign must fetch price
-        ingredientsPrice(product.ingredientsID).then(async (price) => {
+        //Before creatign must fetch the allergen
+        ingredientsAllergen(product.ingredientsID).then(async (allergens) => {
             return await strapi.documents("api::product.product")
             .create({
                 data:{
-                    Name:"Custom",
+                    Name:product.name,
                     category: product.categoryID,
                     Available: false,
-                    Price: price,
-                    TimeToPrepare: product.ingredientsID.length + 5,
+                    allergens:allergens,
+                    TimeToPrepare: product.ingredientsID.length + 2,
+                    Price:product.price
                 },
                 status: "published",
             });
