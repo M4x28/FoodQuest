@@ -62,7 +62,7 @@ export default factories.createCoreController('api::category.category',(({strapi
                 Price: p.Price,
                 ingredients: ingredientsID,
                 allergens: allergensID,
-                image: p.Image ? p.Image.url : null,
+                image: p.Image ? (p.Image.hash +  p.Image.ext): null,
             }
         });
 
