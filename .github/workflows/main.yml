@@ -1,0 +1,58 @@
+name: Deploy Strapi App to Multiple Servers
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install Node.js and dependencies
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      # Step 3: Build the Strapi app
+      - name: Build Strapi App
+        run: |
+          npm run build
+
+      # Step 4: Deploy to multiple servers
+      - name: Deploy to Multiple Servers
+        env:
+          SERVERS: ${{ secrets.SERVERS }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          IFS=',' read -r -a servers <<< "$SERVERS"
+
+          for server_config in "${servers[@]}"; do
+            IFS=':' read -r server_address server_key <<< "$server_config"
+
+            echo "Deploying to $server_address..."
+
+            echo "$server_key" > temp_key
+            chmod 600 temp_key
+
+            # Pull the latest code or clone the repository if not already present
+            ssh -i temp_key -o StrictHostKeyChecking=no "$server_address" "cd $DEPLOY_PATH && git pull || git clone https://github.com/M4x28/FoodQuest.git $DEPLOY_PATH"
+
+            # Install dependencies and build the Strapi app on the server
+            ssh -i temp_key -o StrictHostKeyChecking=no "$server_address" "cd $DEPLOY_PATH && npm install && npm run build"
+
+            # Start the Strapi application using PM2 or directly (for production, PM2 is recommended)
+            ssh -i temp_key -o StrictHostKeyChecking=no "$server_address" "cd $DEPLOY_PATH && pm2 start npm --name 'strapi' -- run start || npm run start"
+
+            rm temp_key
+          done
