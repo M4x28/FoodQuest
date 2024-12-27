@@ -58,6 +58,7 @@ export default factories.createCoreController('api::category.category',(({strapi
             }
 
             return {
+                documentId: p.documentId,
                 Name: p.Name,
                 Price: p.Price,
                 ingredients: ingredientsID,

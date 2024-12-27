@@ -6,8 +6,8 @@ export default {
             handler: 'table.accessTable',
         },
         {
-            method: 'GET',
-            path: '/table/status/:accessCode&:sessionCode',
+            method: 'POST',
+            path: '/table/status',
             handler: 'table.tableStatus',
         },
         {

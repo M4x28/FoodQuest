@@ -151,10 +151,10 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
             {
                 filters:{
                     Datetime:{
-                        $gt: isoDate
+                        $gt: isoDate,
                     },
                     State:{
-                        $not: OrderState.New,
+                        $in: [OrderState.Pending,OrderState.InProgress],
                     }
                 }
             }
@@ -199,6 +199,24 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
             ))
         )
 
+    },
+
+    async getAllOrderByTable(tableID:string){
+        return await strapi.documents("api::order.order").findMany({
+            filters:{
+                table:{
+                    documentId: tableID,
+                },
+                State:{
+                    $in:[OrderState.Pending,OrderState.InProgress,OrderState.Done],
+                }
+            },
+            populate:{
+                partial_orders:{
+                    populate:["product"],
+                }
+            }
+        })
     }
 
 }));

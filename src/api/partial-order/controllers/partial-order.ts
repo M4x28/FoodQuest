@@ -5,10 +5,10 @@ export default factories.createCoreController('api::partial-order.partial-order'
 
     async create(ctx) {
         try {
-            //console.log(ctx.state.user);
+            console.log("Hi1");
             const { productID, users_permissions_user, accessCode, sessionCode } = ctx.request.body.data;
-
-            if (!productID || !accessCode || !sessionCode || !users_permissions_user) {
+            console.log(JSON.stringify(ctx.request.body,null,3));
+            if (!productID || !accessCode || !sessionCode) {
                 return ctx.badRequest('Richiesta non valida dati mancanti');
             }
 
@@ -16,7 +16,7 @@ export default factories.createCoreController('api::partial-order.partial-order'
             const tableService = strapi.service('api::table.table');
             const tableID = await tableService.verify(accessCode, sessionCode);
             //console.log(accessCode + sessionCode + tableID);
-
+            console.log("Hi2");
             // Crea l'ordine parziale usando il servizio
             if (tableID !== null) {
                 const partialOrderService = strapi.service('api::partial-order.partial-order');

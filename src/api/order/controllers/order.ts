@@ -6,7 +6,7 @@ import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 import { OrderState } from '../services/order';
 
-const { ApplicationError } = errors;
+const { ApplicationError, UnauthorizedError } = errors;
 
 export default factories.createCoreController('api::order.order', ({ strapi }) => ({
 
@@ -83,6 +83,43 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
                 PreparationTime: order.PreparationTime,
             }
         })
+    },
+
+    //Get all order made by a table
+    async ordersByTable(ctx) {
+        
+        //Check input validity
+        if(!ctx.request.body.data){
+            throw new ApplicationError("Missing field in request");
+        }
+
+        const {accessCode,sessionCode} = ctx.request.body.data;
+
+        if(!accessCode || !sessionCode){
+            throw new UnauthorizedError("Missing table detail");
+        } 
+
+        const tableID = await strapi.service("api::table.table").verify(accessCode,sessionCode);
+
+        console.log(tableID);
+
+        if(!tableID){
+            throw new UnauthorizedError("Invalid table detail");
+        }
+
+        const orders = await strapi.service("api::order.order").getAllOrderByTable(tableID);
+
+        return orders.map(o => {
+            
+            const prod = o.partial_orders.map((p) => p.product);
+
+            return {
+                documentId: o.documentId,
+                status: o.State,
+                time: o.TimeToService,
+                products: prod,
+            }
+        });
     }
 
 }));

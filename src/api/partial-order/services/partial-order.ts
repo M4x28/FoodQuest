@@ -33,11 +33,20 @@ export default factories.createCoreService('api::partial-order.partial-order', (
                 console.log('Nuovo ordine totale creato:', orderID);
             }
 
-            const partialOrderData: Record<string, any> = {
-                product: { documentId: productID },
-                order: { documentId: orderID },
-                users_permissions_user: { documentId: users_permissions_user }
-            };
+            let partialOrderData;
+
+            if(users_permissions_user){
+                partialOrderData = {
+                    product: { documentId: productID },
+                    order: { documentId: orderID },
+                    users_permissions_user: { documentId: users_permissions_user }
+                };
+            }else{
+                partialOrderData = {
+                    product: { documentId: productID },
+                    order: { documentId: orderID },
+                };
+            }
 
             console.log('Dati ordine parziale preparati:', partialOrderData);
 

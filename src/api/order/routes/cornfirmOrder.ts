@@ -9,6 +9,11 @@ export default {
             method: "POST",
             path: "/order/set_status",
             handler: "order.setStatus"
+        },
+        {
+            method: "POST",
+            path: "/order/get_orders",
+            handler: "order.ordersByTable"
         }
     ]
 }

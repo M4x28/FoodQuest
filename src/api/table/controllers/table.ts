@@ -33,11 +33,12 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
 
     async tableStatus(ctx) {
 
-        if (!ctx.params || !ctx.params.accessCode || !ctx.params.sessionCode) {
+        const { accessCode,sessionCode } = ctx.request.body.data;
+
+            // Verifica che il tavolo sia specificato
+        if (!accessCode || !sessionCode) {
             throw new ApplicationError("Missing parameter in query");
         }
-
-        const { accessCode, sessionCode } = ctx.params;
 
         const table = await strapi.service('api::table.table').getTable(accessCode);
 
@@ -59,26 +60,30 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
      */
     async checkRequest(ctx) {
         try {
-            const { tableID } = ctx.request.body.data;
+            const { accessCode,sessionCode } = ctx.request.body.data;
 
             // Verifica che il tavolo sia specificato
-            if (!tableID) {
-                return ctx.badRequest('ID del tavolo mancante');
+            if (!accessCode || !sessionCode) {
+                return ctx.badRequest('Dettagli del tavolo mancanti');
             }
 
             // Verifica che il tavolo esista
-            const table = await strapi.documents('api::table.table').findOne({
-                documentId: tableID
-            });
-
-            if (!table) {
+            const tableService = strapi.service('api::table.table');
+            const tableID = await tableService.verify(accessCode,sessionCode);
+            
+            if (!tableID) {
                 return ctx.notFound('Tavolo non trovato');
             }
 
             // Conta gli ordini associati al tavolo
             const ordersCount = await strapi.documents('api::order.order').count({
                 filters: {
-                    table: { documentId: tableID }
+                    table: { 
+                        documentId: tableID 
+                    },
+                    State: {
+                        $not:"Paid"
+                    }
                 }
             });
 
@@ -87,10 +92,9 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
             }
 
             // Richiama il service appropriato per la richiesta
-            const tableService = strapi.service('api::table.table');
-            await tableService.checkRequest(table.documentId);
+            await tableService.checkRequest(tableID);
 
-            return ctx.send({ message: `Richiesta per il tavolo ${table.Number} elaborata con successo.` });
+            return ctx.send({ message: `Richiesta per il tavolo ${tableID} elaborata con successo.` });
         } catch (error) {
             console.error('Errore durante la verifica della richiesta:', error);
             return ctx.internalServerError('Errore durante la verifica della richiesta');
