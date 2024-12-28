@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-12-27T10:29:20.407Z"
+    "x-generation-date": "2024-12-28T13:11:57.340Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -7463,6 +7463,9 @@
                                           }
                                         }
                                       },
+                                      "Points": {
+                                        "type": "integer"
+                                      },
                                       "createdAt": {
                                         "type": "string",
                                         "format": "date-time"
@@ -9554,6 +9557,9 @@
                                 }
                               }
                             }
+                          },
+                          "Points": {
+                            "type": "integer"
                           },
                           "createdAt": {
                             "type": "string",
@@ -11940,6 +11946,9 @@
                   }
                 }
               },
+              "Points": {
+                "type": "integer"
+              },
               "createdAt": {
                 "type": "string",
                 "format": "date-time"
@@ -13294,6 +13303,9 @@
                                                 }
                                               }
                                             }
+                                          },
+                                          "Points": {
+                                            "type": "integer"
                                           },
                                           "createdAt": {
                                             "type": "string",
@@ -15338,6 +15350,9 @@
                                             }
                                           }
                                         }
+                                      },
+                                      "Points": {
+                                        "type": "integer"
                                       },
                                       "createdAt": {
                                         "type": "string",
@@ -17677,6 +17692,9 @@
                         }
                       }
                     },
+                    "Points": {
+                      "type": "integer"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -19468,6 +19486,9 @@
                               }
                             }
                           }
+                        },
+                        "Points": {
+                          "type": "integer"
                         },
                         "createdAt": {
                           "type": "string",
@@ -21455,6 +21476,9 @@
                                     }
                                   }
                                 }
+                              },
+                              "Points": {
+                                "type": "integer"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -23869,6 +23893,9 @@
                                 }
                               }
                             }
+                          },
+                          "Points": {
+                            "type": "integer"
                           },
                           "createdAt": {
                             "type": "string",
