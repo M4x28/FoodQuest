@@ -93,7 +93,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
             throw new ApplicationError("Missing field in request");
         }
 
-        const {accessCode,sessionCode} = ctx.request.body.data;
+        const {accessCode,sessionCode,editedAfter} = ctx.request.body.data;
 
         if(!accessCode || !sessionCode){
             throw new UnauthorizedError("Missing table detail");
@@ -109,7 +109,21 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
 
         const orders = await strapi.service("api::order.order").getAllOrderByTable(tableID);
 
-        return orders.map(o => {
+        if(editedAfter){
+            const editedOrder = orders.filter(o => (new Date(o.updatedAt).getTime() > new Date(editedAfter).getTime()));
+            
+            console.log(JSON.stringify(editedOrder,null,4));
+
+            if(editedOrder.length == 0){
+                return {
+                    meta:{
+                        edited:false
+                    }
+                }
+            }
+        }
+
+        const reducedOrder = orders.map(o => {
             
             const prod = o.partial_orders.map((p) => p.product);
 
@@ -120,6 +134,13 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
                 products: prod,
             }
         });
+
+        return {
+            data:reducedOrder,
+            meta:{
+                edited:true
+            }
+        }
     }
 
 }));

@@ -4,10 +4,12 @@
 
 import { factories } from '@strapi/strapi'
 import { errors } from '@strapi/utils';
-import productPreprocessor from './productPreprocessor';
-import { ingredientsAllergen } from '../services/product';
+import { productPreprocessor } from './productPreprocessor';
+import clientProductRule from './preprocessRules';
 
 const { ApplicationError, UnauthorizedError } = errors;
+
+const clientPreprocessor = new productPreprocessor(clientProductRule);
 
 interface Table{
     accessCode: string,
@@ -18,6 +20,7 @@ export default factories.createCoreController('api::product.product', ( ({strapi
 
     async createCustomProduct(ctx){
         
+
         if(!ctx.request.body || !ctx.request.body.table || !ctx.request.body.product)
             throw new ApplicationError("Missing field in request");
 
@@ -29,7 +32,7 @@ export default factories.createCoreController('api::product.product', ( ({strapi
             throw new UnauthorizedError("Invalid table credential");
         
         //Preprocess product before creation
-        const processedProd = await productPreprocessor(product);
+        const processedProd = await clientPreprocessor.process(product);
         if(!processedProd)
             throw new ApplicationError("Wrong Product Format");
 
