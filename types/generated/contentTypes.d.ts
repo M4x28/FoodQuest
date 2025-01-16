@@ -420,6 +420,42 @@ export interface ApiAllergenAllergen extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAssociationRuleAssociationRule
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'association_rules';
+  info: {
+    displayName: 'AssociationRule';
+    pluralName: 'association-rules';
+    singularName: 'association-rule';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    chosen_ingredient: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::ingredient.ingredient'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::association-rule.association-rule'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    recommended_ingredient: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::ingredient.ingredient'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
@@ -562,9 +598,23 @@ export interface ApiIngredientIngredient extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::allergen.allergen'
     >;
+    association_rule: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::association-rule.association-rule'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    defaultIngredientBuilding: Schema.Attribute.Enumeration<
+      ['default', 'none']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'none'>;
     ingredient_wrappers: Schema.Attribute.Relation<
       'manyToMany',
       'api::ingredient-wrapper.ingredient-wrapper'
@@ -576,6 +626,7 @@ export interface ApiIngredientIngredient extends Struct.CollectionTypeSchema {
     >;
     Name: Schema.Attribute.String &
       Schema.Attribute.Required &
+      Schema.Attribute.Unique &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
@@ -595,14 +646,21 @@ export interface ApiIngredientIngredient extends Struct.CollectionTypeSchema {
         number
       >;
     publishedAt: Schema.Attribute.DateTime;
-    Type: Schema.Attribute.Enumeration<['default', 'pizza-base']> &
+    Type: Schema.Attribute.Enumeration<['pizza-base', 'extra']> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
         };
       }> &
-      Schema.Attribute.DefaultTo<'default'>;
+      Schema.Attribute.DefaultTo<'extra'>;
+    UIDIngredient: Schema.Attribute.UID<'Name'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1451,6 +1509,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::allergen.allergen': ApiAllergenAllergen;
+      'api::association-rule.association-rule': ApiAssociationRuleAssociationRule;
       'api::category.category': ApiCategoryCategory;
       'api::fidelity-card.fidelity-card': ApiFidelityCardFidelityCard;
       'api::ingredient-wrapper.ingredient-wrapper': ApiIngredientWrapperIngredientWrapper;

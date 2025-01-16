@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "association_rules",
+  "info": {
+    "singularName": "association-rule",
+    "pluralName": "association-rules",
+    "displayName": "AssociationRule"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "chosen_ingredient": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::ingredient.ingredient",
+      "inversedBy": "association_rule"
+    },
+    "recommended_ingredient": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::ingredient.ingredient"
+    }
+  }
+}

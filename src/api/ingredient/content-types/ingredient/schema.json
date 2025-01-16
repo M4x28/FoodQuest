@@ -23,7 +23,8 @@
         }
       },
       "type": "string",
-      "required": true
+      "required": true,
+      "unique": true
     },
     "Price": {
       "pluginOptions": {
@@ -55,11 +56,41 @@
       },
       "type": "enumeration",
       "enum": [
-        "default",
-        "pizza-base"
+        "pizza-base",
+        "extra"
       ],
       "required": true,
-      "default": "default"
+      "default": "extra"
+    },
+    "UIDIngredient": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "uid",
+      "targetField": "Name",
+      "required": true
+    },
+    "defaultIngredientBuilding": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "enumeration",
+      "enum": [
+        "default",
+        "none"
+      ],
+      "default": "none",
+      "required": true
+    },
+    "association_rule": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::association-rule.association-rule",
+      "mappedBy": "chosen_ingredient"
     }
   }
 }
