@@ -20,7 +20,6 @@ export default factories.createCoreController('api::product.product', ( ({strapi
 
     async createCustomProduct(ctx){
         
-
         if(!ctx.request.body || !ctx.request.body.table || !ctx.request.body.product)
             throw new ApplicationError("Missing field in request");
 
@@ -42,6 +41,31 @@ export default factories.createCoreController('api::product.product', ( ({strapi
             throw new ApplicationError("Wrong Input Format");
         }
         return {data:{id:prodID}};
+    },
+
+    async ingredientOf(ctx) {
+        
+        const documentId = ctx.params.prodID;
+
+        if(!documentId){
+            throw new ApplicationError("Missing ID");
+        }
+
+        const ig = await strapi.documents("api::ingredient.ingredient").findMany({
+            filters:{
+                ingredient_wrappers:{
+                    product:{
+                        documentId:documentId
+                    }
+                }
+            }
+        });
+
+        console.log(JSON.stringify(ig));
+
+        return {
+            data:ig
+        }
     }
 
     })

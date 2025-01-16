@@ -99,9 +99,42 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
             console.error('Errore durante la verifica della richiesta:', error);
             return ctx.internalServerError('Errore durante la verifica della richiesta');
         }
+    },
+
+    async total(ctx) {
+        
+        if (!ctx.params || !ctx.params.accessCode) {
+            throw new ApplicationError("Missing parameter in query");
+        }
+
+        const { accessCode } = ctx.params;
+
+        //Search table by accessCode
+        const table = await strapi.service('api::table.table').getTable(accessCode);
+
+        if (!table) {
+            throw new UnauthorizedError("No valid table found","");
+        }
+
+        //Get all ordered product
+        const products = await strapi.service("api::order.order").getAllOrderByTable(table.documentId)
+            .then(res => 
+                res.flatMap(o => o.partial_orders.map(p => p.product))
+            )
+
+        //Calculate total
+        const total = products.map(p => p.Price).reduce((x,y) => x + y,0);
+        //Calculate discount
+        const discount = 10;
+        
+        return{
+            data:{
+                total,
+                discount
+            }
+        }
+
     }
-
-
 
 })
 ));

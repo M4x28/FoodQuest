@@ -14,6 +14,11 @@ export default {
             method: 'POST',
             path: '/table/checkRequest',
             handler: 'table.checkRequest',
+        },
+        {
+            method: 'GET',
+            path: '/table/total/:accessCode',
+            handler: 'table.total',
         }
     ]
 }
