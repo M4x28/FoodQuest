@@ -76,11 +76,6 @@
       "relation": "oneToMany",
       "target": "api::partial-order.partial-order",
       "mappedBy": "users_permissions_user"
-    },
-    "Points": {
-      "type": "integer",
-      "min": 0,
-      "default": 0
     }
   }
 }

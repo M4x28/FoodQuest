@@ -125,33 +125,50 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-   * Modifica lo stato del campo UsePoints (0, 1, null)
-   */
+    * Modifica lo stato del campo UsePoints (0, 1, null)
+    */
     async updateUsePoints(ctx) {
         const schema = Joi.object({
-            users_permissions_user: Joi.string().required(),
-            usePoints: Joi.valid(0, 1, null).required(),
+            data: Joi.object({
+                users_permissions_user: Joi.string().required(),
+                usePoints: Joi.valid(0, 1, null).required(),
+            }).required(),
         });
 
+        // Valida il corpo della richiesta
         const { error } = schema.validate(ctx.request.body);
         if (error) {
             return ctx.badRequest({
-                message: 'Errore di validazione',
-                details: error.details,
+                message: 'Errore di validazione dei dati inviati',
+                details: error.details.map((detail) => detail.message),
             });
         }
 
-        const { users_permissions_user, usePoints } = ctx.request.body;
+        const {
+            data: { users_permissions_user, usePoints },
+        } = ctx.request.body;
 
         try {
+            // Chiamata al servizio per aggiornare UsePoints
             const response = await strapi
                 .service('api::fidelity-card.fidelity-card')
                 .updateUsePoints(users_permissions_user, usePoints);
 
-            return ctx.send(response);
+            // Risposta in caso di successo
+            return ctx.send({
+                success: true,
+                message: 'UsePoints aggiornato con successo',
+                data: response,
+            });
         } catch (error) {
-            strapi.log.error(error.message);
-            return ctx.internalServerError('Errore durante l\'aggiornamento dello stato di UsePoints');
+            // Log dell'errore per il debugging
+            strapi.log.error('Errore nell\'aggiornamento di UsePoints:', error);
+
+            // Risposta in caso di errore
+            return ctx.internalServerError({
+                message: 'Errore durante l\'aggiornamento dello stato di UsePoints',
+                details: error.message,
+            });
         }
     },
 
