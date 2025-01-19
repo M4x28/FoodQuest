@@ -27,6 +27,10 @@
     "Datetime": {
       "type": "datetime",
       "required": false
+    },
+    "UsePoints": {
+      "type": "boolean",
+      "required": false
     }
   }
 }
