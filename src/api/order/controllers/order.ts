@@ -85,6 +85,54 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
         })
     },
 
+    async currentOrder(ctx){
+        //Check input validity
+        if(!ctx.request.body.data){
+            throw new ApplicationError("Missing field in request");
+        }
+
+        const {accessCode,sessionCode,editedAfter} = ctx.request.body.data;
+
+        if(!accessCode || !sessionCode){
+            throw new UnauthorizedError("Missing table detail");
+        } 
+
+        const tableID = await strapi.service("api::table.table").verify(accessCode,sessionCode);
+
+        if(!tableID){
+            throw new UnauthorizedError("Invalid table detail");
+        }
+        
+        const order = await strapi.service('api::order.order').getOrderByTable(tableID);
+
+        console.log(JSON.stringify(order,null,3))
+
+        if(!order){
+            return{
+                data:null,
+                meta:{
+                    edited:true
+                }
+            }
+        }
+
+        if(editedAfter && new Date(order.updatedAt).getTime() < new Date(editedAfter).getTime()){
+            return{
+                meta:{
+                    edited:false
+                }
+            }
+        }
+
+        return{
+            data:reduceOrder(order),
+            meta:{
+                edited:true
+            }
+        }
+
+    },
+
     //Get all order made by a table
     async ordersByTable(ctx) {
         
@@ -109,6 +157,15 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
 
         const orders = await strapi.service("api::order.order").getAllOrderByTable(tableID);
 
+        if(!orders || orders.length == 0){
+            return {
+                data:[],
+                meta:{
+                    edited:true
+                }
+            };
+        }
+
         if(editedAfter){
             const editedOrder = orders.filter(o => (new Date(o.updatedAt).getTime() > new Date(editedAfter).getTime()));
             
@@ -123,17 +180,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
             }
         }
 
-        const reducedOrder = orders.map(o => {
-            
-            const prod = o.partial_orders.map((p) => p.product);
-
-            return {
-                documentId: o.documentId,
-                status: o.State,
-                time: o.TimeToService,
-                products: prod,
-            }
-        });
+        const reducedOrder = orders.map(reduceOrder);
 
         return {
             data:reducedOrder,
@@ -142,5 +189,16 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
             }
         }
     }
-
 }));
+
+const reduceOrder = (o) => {
+            
+    const prod = o.partial_orders.map((p) => p.product);
+
+    return {
+        documentId: o.documentId,
+        status: o.State,
+        time: o.TimeToService,
+        products: prod,
+    }
+}

@@ -12,6 +12,11 @@ export default {
         },
         {
             method: "POST",
+            path: "/order/current",
+            handler: "order.currentOrder"
+        },
+        {
+            method: "POST",
             path: "/order/get_orders",
             handler: "order.ordersByTable"
         }

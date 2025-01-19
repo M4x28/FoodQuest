@@ -54,6 +54,14 @@ export default factories.createCoreService('api::partial-order.partial-order', (
                 data: partialOrderData
             });
 
+            //Forcing update
+            strapi.documents("api::order.order").update({
+                documentId:orderID,
+                data:{
+                    updatedAt:new Date().toISOString(),
+                }
+            });
+
             console.log('Ordine parziale creato:', partialOrder);
 
             await this.checkAndUpdateOrderState(orderID, tableID);

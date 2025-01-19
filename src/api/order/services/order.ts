@@ -30,6 +30,20 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
         return order.length > 0 ? order[0].documentId : false;
     },
 
+    async getOrderByTable(tableID: string){
+        return strapi.documents('api::order.order').findFirst({
+            filters: {
+                table: { documentId: tableID },
+                State: OrderState.New
+            },
+            populate:{
+                partial_orders:{
+                    populate:["product"],
+                }
+            }
+        });
+    },
+
     /**
      * Crea un nuovo ordine associato a un tavolo
      * @param tableID - documentId del tavolo
