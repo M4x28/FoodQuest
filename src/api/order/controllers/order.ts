@@ -11,7 +11,7 @@ const { ApplicationError, UnauthorizedError } = errors;
 export default factories.createCoreController('api::order.order', ({ strapi }) => ({
 
     async confirmOrder(ctx) {
-        const { orderID } = ctx.request.body.data;
+        const { orderID, allCoursesTogetherFlag } = ctx.request.body.data;
 
         // Verifica che il tavolo sia specificato
         if (!orderID) {
@@ -29,7 +29,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
 
             // Aggiorna lo stato dell'ordine a 'Pending'
             const orderService = strapi.service('api::order.order');
-            const orderReturn = await orderService.confirmOrder(order.documentId);
+            const orderReturn = await orderService.confirmOrder(order.documentId, allCoursesTogetherFlag);
 
             return ctx.send({ message: 'Ordine confermato con successo', data: orderReturn });
         } catch (error) {
@@ -45,7 +45,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
             throw new ApplicationError("Missing field in request");
         }
 
-        const {orderID,newStatus} = ctx.request.body.data;
+        const {orderID, newStatus} = ctx.request.body.data;
 
         if(!orderID || !newStatus || newStatus == OrderState.New){
             throw new ApplicationError("Invalid field in request");

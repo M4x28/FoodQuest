@@ -30,15 +30,19 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
         return order.length > 0 ? order[0].documentId : false;
     },
 
-    async getOrderByTable(tableID: string){
+    async getOrderByTable(tableID: string) {
         return strapi.documents('api::order.order').findFirst({
             filters: {
                 table: { documentId: tableID },
                 State: OrderState.New
             },
-            populate:{
-                partial_orders:{
-                    populate:["product"],
+            populate: {
+                partial_orders: {
+                    populate: {
+                        product: {
+                            populate: ['category'],
+                        },
+                    },
                 }
             }
         });
@@ -55,6 +59,7 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
             data: {
                 table: { documentId: tableID },
                 State: state,
+                AllCoursesTogether: false,
                 Datetime: new Date().toISOString()
             }
         });
@@ -64,11 +69,11 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
     },
 
 
-     /**
-     * Conferma un ordine esistente cambiando lo stato da "New" a "Pending"
-     * @param orderID - documentId dell'ordine totale da confermare
-     */
-    async confirmOrder(orderID: string): Promise<boolean> {
+    /**
+    * Conferma un ordine esistente cambiando lo stato da "New" a "Pending"
+    * @param orderID - documentId dell'ordine totale da confermare
+    */
+    async confirmOrder(orderID: string, allCoursesTogetherFlag: boolean): Promise<boolean> {
         const order = await strapi.documents('api::order.order').findOne({
             documentId: orderID
         });
@@ -85,8 +90,9 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
         await strapi.documents('api::order.order').update({
             documentId: orderID,
             data: {
-                Datetime: new Date().toISOString(), 
+                Datetime: new Date().toISOString(),
                 State: OrderState.Pending,
+                AllCoursesTogether: allCoursesTogetherFlag,
                 PreparationTime: time,
                 TimeToService: tts,
             }
@@ -96,23 +102,23 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
     },
 
     //Calculate Preparation Time of new order
-    async calculatePrepTime(orderID:string):Promise<number>{
-        
-        const categoryMap:Map<string,number> = new Map<string,number>();
+    async calculatePrepTime(orderID: string): Promise<number> {
+
+        const categoryMap: Map<string, number> = new Map<string, number>();
 
         //Get all products in the order and their category
         const products = await strapi.documents("api::product.product").findMany({
-            filters:{
-                partial_orders:{
-                    State:{
-                        $not:"Pending"
+            filters: {
+                partial_orders: {
+                    State: {
+                        $not: "Pending"
                     },
-                    order:{
+                    order: {
                         documentId: orderID
                     },
                 }
             },
-            populate:["category"]
+            populate: ["category"]
         });
 
         //Getting the product with the longest time to prepare for each category
@@ -122,34 +128,34 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
 
             console.log("Product: ", product.Name, "Time: ", time);
 
-            if(categoryMap.has(category)){
-                if(categoryMap.get(category) < time){
-                    categoryMap.set(category,time);
+            if (categoryMap.has(category)) {
+                if (categoryMap.get(category) < time) {
+                    categoryMap.set(category, time);
                 }
-            }else{
-                categoryMap.set(category,time);
+            } else {
+                categoryMap.set(category, time);
             }
         });
 
         //Sum times
-        const prepTime:number = Array.from(categoryMap.values()).reduce((x,y) => x+y,0);
-        console.log("Preparation Time: ",prepTime);
+        const prepTime: number = Array.from(categoryMap.values()).reduce((x, y) => x + y, 0);
+        console.log("Preparation Time: ", prepTime);
         return prepTime;
     },
 
     //Get the order right before order made in time: isoDate
-    async getOrderBefore(isoDate:string){
-        
+    async getOrderBefore(isoDate: string) {
+
         return strapi.documents("api::order.order").findFirst({
-            filters:{
-                Datetime:{
-                    $lt:isoDate
+            filters: {
+                Datetime: {
+                    $lt: isoDate
                 },
-                State:{
+                State: {
                     $not: OrderState.New,
                 }
             },
-            sort:[
+            sort: [
                 {
                     Datetime: "desc"
                 }
@@ -158,17 +164,17 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
     },
 
     //Change the time of all order after isoDate
-    async editOrderAfter(isoDate:string, timeChange: number) {
-        
+    async editOrderAfter(isoDate: string, timeChange: number) {
+
         //Find all orders made after isoDate
         const orders = await strapi.documents("api::order.order").findMany(
             {
-                filters:{
-                    Datetime:{
+                filters: {
+                    Datetime: {
                         $gt: isoDate,
                     },
-                    State:{
-                        $in: [OrderState.Pending,OrderState.InProgress],
+                    State: {
+                        $in: [OrderState.Pending, OrderState.InProgress],
                     }
                 }
             }
@@ -178,21 +184,21 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
         Promise.all(
             orders.map((order) => (
                 strapi.documents("api::order.order").update(
-                {
-                    documentId: order.documentId,
-                    data:{
-                        TimeToService:order.TimeToService + timeChange,
-                    }
-                })
+                    {
+                        documentId: order.documentId,
+                        data: {
+                            TimeToService: order.TimeToService + timeChange,
+                        }
+                    })
             ))
         )
     },
 
-    async closeAllpartialOrder(orderID:string){
+    async closeAllpartialOrder(orderID: string) {
         //Fetch all non done partial in order
         const partial = await strapi.documents("api::partial-order.partial-order").findMany({
-            filters:{
-                State:{
+            filters: {
+                State: {
                     $not: "Done"
                 },
                 order: {
@@ -205,8 +211,8 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
         Promise.all(
             partial.map(po => (
                 strapi.documents("api::partial-order.partial-order").update({
-                    documentId:po.documentId,
-                    data:{
+                    documentId: po.documentId,
+                    data: {
                         State: "Done"
                     }
                 })
@@ -215,19 +221,19 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
 
     },
 
-    async getAllOrderByTable(tableID:string){
+    async getAllOrderByTable(tableID: string) {
         return await strapi.documents("api::order.order").findMany({
-            filters:{
-                table:{
+            filters: {
+                table: {
                     documentId: tableID,
                 },
-                State:{
-                    $in:[OrderState.Pending,OrderState.InProgress,OrderState.Done],
+                State: {
+                    $in: [OrderState.Pending, OrderState.InProgress, OrderState.Done],
                 }
             },
-            populate:{
-                partial_orders:{
-                    populate:["product"],
+            populate: {
+                partial_orders: {
+                    populate: ["product"],
                 }
             }
         })

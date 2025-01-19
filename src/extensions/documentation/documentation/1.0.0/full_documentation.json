@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-01-19T14:29:57.367Z"
+    "x-generation-date": "2025-01-19T16:33:09.517Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -8215,6 +8215,9 @@
                                       "TimeToService": {
                                         "type": "integer"
                                       },
+                                      "AllCoursesTogether": {
+                                        "type": "boolean"
+                                      },
                                       "createdAt": {
                                         "type": "string",
                                         "format": "date-time"
@@ -10271,6 +10274,9 @@
                                     },
                                     "TimeToService": {
                                       "type": "integer"
+                                    },
+                                    "AllCoursesTogether": {
+                                      "type": "boolean"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -12554,6 +12560,9 @@
                           "TimeToService": {
                             "type": "integer"
                           },
+                          "AllCoursesTogether": {
+                            "type": "boolean"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -14710,6 +14719,9 @@
                         "TimeToService": {
                           "type": "integer"
                         },
+                        "AllCoursesTogether": {
+                          "type": "boolean"
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -16395,6 +16407,9 @@
                                           },
                                           "TimeToService": {
                                             "type": "integer"
+                                          },
+                                          "AllCoursesTogether": {
+                                            "type": "boolean"
                                           },
                                           "createdAt": {
                                             "type": "string",
@@ -18561,6 +18576,9 @@
                                       "TimeToService": {
                                         "type": "integer"
                                       },
+                                      "AllCoursesTogether": {
+                                        "type": "boolean"
+                                      },
                                       "createdAt": {
                                         "type": "string",
                                         "format": "date-time"
@@ -19183,7 +19201,8 @@
           "data": {
             "required": [
               "State",
-              "Datetime"
+              "Datetime",
+              "AllCoursesTogether"
             ],
             "type": "object",
             "properties": {
@@ -19231,6 +19250,9 @@
               },
               "TimeToService": {
                 "type": "integer"
+              },
+              "AllCoursesTogether": {
+                "type": "boolean"
               },
               "locale": {
                 "type": "string"
@@ -19292,7 +19314,8 @@
         "type": "object",
         "required": [
           "State",
-          "Datetime"
+          "Datetime",
+          "AllCoursesTogether"
         ],
         "properties": {
           "id": {
@@ -21093,6 +21116,9 @@
                     "TimeToService": {
                       "type": "integer"
                     },
+                    "AllCoursesTogether": {
+                      "type": "boolean"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -21216,6 +21242,9 @@
           },
           "TimeToService": {
             "type": "integer"
+          },
+          "AllCoursesTogether": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -22984,6 +23013,9 @@
                         },
                         "TimeToService": {
                           "type": "integer"
+                        },
+                        "AllCoursesTogether": {
+                          "type": "boolean"
                         },
                         "createdAt": {
                           "type": "string",
@@ -25071,6 +25103,9 @@
                               },
                               "TimeToService": {
                                 "type": "integer"
+                              },
+                              "AllCoursesTogether": {
+                                "type": "boolean"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -27613,6 +27648,9 @@
                 },
                 "TimeToService": {
                   "type": "integer"
+                },
+                "AllCoursesTogether": {
+                  "type": "boolean"
                 },
                 "createdAt": {
                   "type": "string",
