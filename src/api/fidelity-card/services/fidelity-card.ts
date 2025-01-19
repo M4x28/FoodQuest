@@ -122,42 +122,15 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
     },
 
     /**
-     * Elimina la fidelity card di un utente basandosi sul suo proprietario.
+     * Aggiorna lo stato del campo UsePoints per un utente
      * @param users_permissions_user - ID dell'utente
-     * @returns Messaggio di successo
+     * @param usePoints - Nuovo stato (0, 1, null)
+     * @returns Messaggio di successo o errore
      */
-    async deleteFidelityCard(users_permissions_user: string): Promise<object> {
-        const fidelityCards = await strapi.documents('api::fidelity-card.fidelity-card').findMany({
-            filters: { users_permissions_user: { documentId: users_permissions_user } },
-            limit: 1,
-        });
-
-        if (fidelityCards.length === 0) {
-            throw new Error('Fidelity card non trovata');
-        }
-
-        const fidelityCard = fidelityCards[0];
-
-        await strapi.documents('api::fidelity-card.fidelity-card').delete({
-            documentId: fidelityCard.documentId,
-        });
-
-        return {
-            success: true,
-            message: `Fidelity card eliminata con successo per l'utente ${users_permissions_user}.`,
-        };
-    },
-
-    /**
-   * Aggiorna lo stato del campo UsePoints per un utente
-   * @param users_permissions_user - ID dell'utente
-   * @param usePoints - Nuovo stato (0, 1, null)
-   * @returns Messaggio di successo o errore
-   */
     async updateUsePoints(users_permissions_user: string, usePoints: 0 | 1 | null): Promise<object> {
         // Trova la fidelity card dell'utente
-        const fidelityCard = await strapi.db.query('api::fidelity-card.fidelity-card').findOne({
-            where: { users_permissions_user },
+        const fidelityCard = await strapi.documents('api::fidelity-card.fidelity-card').findFirst({
+            filters: { users_permissions_user: { documentId: users_permissions_user } },
         });
 
         if (!fidelityCard) {
@@ -165,8 +138,8 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
         }
 
         // Aggiorna il campo UsePoints
-        const updatedFidelityCard = await strapi.db.query('api::fidelity-card.fidelity-card').update({
-            where: { id: fidelityCard.id },
+        const updatedFidelityCard = await strapi.documents('api::fidelity-card.fidelity-card').update({
+            documentId: fidelityCard.documentId,
             data: { UsePoints: usePoints },
         });
 
@@ -178,31 +151,35 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
     },
 
     /**
-   * Recupera una fidelity card basata sull'ID dell'utente
-   * @param users_permissions_user - ID dell'utente
-   * @returns Fidelity card o null se non trovata
-   */
+     * Recupera una fidelity card basata sull'ID dell'utente
+     * @param users_permissions_user - ID dell'utente
+     * @returns Fidelity card o null se non trovata
+     */
     async getFidelityCard(users_permissions_user: string): Promise<object | null> {
-        const fidelityCard = await strapi.db.query('api::fidelity-card.fidelity-card').findOne({
-            where: { users_permissions_user },
+        const fidelityCard = await strapi.documents('api::fidelity-card.fidelity-card').findFirst({
+            filters: { users_permissions_user: { documentId: users_permissions_user } },
         });
 
         return fidelityCard || null;
     },
 
     /**
-   * Resetta i punti di una fidelity card se UsePoints è settato a 1
-   * @param users_permissions_user - Array di ID degli utenti
-   * @returns Oggetto con liste di successi e fallimenti
-   */
+     * Resetta i punti di una fidelity card se UsePoints è settato a 1
+     * @param users_permissions_user - Array di ID degli utenti
+     * @returns Oggetto con liste di successi e fallimenti
+     */
     async resetPoints(users_permissions_user: string[]): Promise<object> {
         const success = [];
         const failed = [];
 
         for (const userId of users_permissions_user) {
             try {
-                const fidelityCard = await strapi.db.query('api::fidelity-card.fidelity-card').findOne({
-                    where: { users_permissions_user: userId },
+                const fidelityCard = await strapi.documents('api::fidelity-card.fidelity-card').findFirst({
+                    filters: {
+                        users_permissions_user: {
+                            id: { $in: users_permissions_user },
+                        },
+                    },
                 });
 
                 if (!fidelityCard) {
@@ -210,13 +187,13 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
                     continue;
                 }
 
-                if (fidelityCard.UsePoints !== 1) {
+                if (!fidelityCard.UsePoints) {
                     failed.push({ userId, reason: 'UsePoints non settato a 1' });
                     continue;
                 }
 
-                await strapi.db.query('api::fidelity-card.fidelity-card').update({
-                    where: { id: fidelityCard.id },
+                await strapi.documents('api::fidelity-card.fidelity-card').update({
+                    documentId: fidelityCard.documentId,
                     data: { Points: 0 },
                 });
 
