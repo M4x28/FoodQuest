@@ -62,7 +62,7 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
      * @param {number} tableNumber - Il numero del tavolo
      * @returns {number} - Lo sconto totale calcolato
      */
-    async calculateTableDiscount(tableNumber) {
+    async calculateTableDiscount(tableNumber: number): Promise<number> {
         try {
             // Trova il tavolo corrispondente al numero e popola gli ordini associati
             const tables = await strapi.documents('api::table.table').findMany({

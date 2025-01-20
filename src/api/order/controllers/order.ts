@@ -1,5 +1,5 @@
 /**
- * Controller per confermare l'ordine
+ * Controller per la gestione degli ordini.
  */
 
 import { factories } from '@strapi/strapi';
@@ -10,24 +10,35 @@ const { ApplicationError, UnauthorizedError } = errors;
 
 export default factories.createCoreController('api::order.order', ({ strapi }) => ({
 
+    /**
+     * Conferma un ordine specifico impostandolo come "Pending".
+     * 
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Messaggio di successo e dettagli dell'ordine aggiornato.
+     * @throws {BadRequestError} Se l'ID dell'ordine non è specificato.
+     * @throws {NotFoundError} Se l'ordine non è trovato.
+     * @throws {InternalServerError} In caso di errore interno del server.
+     */
     async confirmOrder(ctx) {
         const { orderID, allCoursesTogetherFlag } = ctx.request.body.data;
 
-        // Verifica che il tavolo sia specificato
+        // Verifica che l'ID dell'ordine sia specificato
         if (!orderID) {
             return ctx.badRequest('ID dell\'ordine mancante');
         }
 
         try {
+            // Recupera l'ordine specifico dal database
             const order = await strapi.documents('api::order.order').findOne({
                 documentId: orderID
             });
 
+            // Controlla che l'ordine esista
             if (order.documentId !== orderID) {
                 return ctx.notFound('Ordine non trovato');
             }
 
-            // Aggiorna lo stato dell'ordine a 'Pending'
+            // Utilizza il servizio per aggiornare lo stato dell'ordine
             const orderService = strapi.service('api::order.order');
             const orderReturn = await orderService.confirmOrder(order.documentId, allCoursesTogetherFlag);
 
@@ -38,161 +49,179 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
         }
     },
 
-    async setStatus(ctx){
-
-        //Check input validity
-        if(!ctx.request.body.data){
+    /**
+     * Aggiorna lo stato di un ordine specifico.
+     * 
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} L'ordine aggiornato.
+     * @throws {ApplicationError} Se i campi richiesti sono mancanti o non validi.
+     */
+    async setStatus(ctx) {
+        // Verifica la validità dei dati di input
+        if (!ctx.request.body.data) {
             throw new ApplicationError("Missing field in request");
         }
 
-        const {orderID, newStatus} = ctx.request.body.data;
+        const { orderID, newStatus } = ctx.request.body.data;
 
-        if(!orderID || !newStatus || newStatus == OrderState.New){
+        if (!orderID || !newStatus || newStatus == OrderState.New) {
             throw new ApplicationError("Invalid field in request");
         }
 
+        // Recupera l'ordine dal database
         let order = await strapi.documents('api::order.order').findOne({
             documentId: orderID
         });
 
-        if(order == null){
+        if (order == null) {
             throw new ApplicationError("No order found");
         }
 
-        //In case there isn't a meaningful change in state terminate early
-        if(newStatus == order.State){
+        // Termina anticipatamente se lo stato non cambia
+        if (newStatus == order.State) {
             return order;
         }
 
         const services = strapi.service("api::order.order");
 
-        //if the order is ready update time to service of every following order
-        if(newStatus == OrderState.Done){
+        // Gestisce l'aggiornamento quando l'ordine è completato
+        if (newStatus == OrderState.Done) {
             services.editOrderAfter(order.Datetime.toString(), -order.PreparationTime);
             services.closeAllpartialOrder(orderID);
             order.TimeToService = 0;
             order.PreparationTime = 0;
         }
 
-        //Update order
+        // Aggiorna lo stato dell'ordine nel database
         return await strapi.documents("api::order.order").update({
             documentId: order.documentId,
-            data:{
+            data: {
                 State: newStatus,
                 TimeToService: order.TimeToService,
                 PreparationTime: order.PreparationTime,
             }
-        })
+        });
     },
 
-    async currentOrder(ctx){
-        //Check input validity
-        if(!ctx.request.body.data){
+    /**
+     * Recupera l'ordine corrente associato a un tavolo specifico.
+     * 
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Dettagli dell'ordine corrente o null se non esiste.
+     * @throws {UnauthorizedError} Se i dettagli del tavolo non sono forniti o non validi.
+     */
+    async currentOrder(ctx) {
+        // Verifica la validità dei dati di input
+        if (!ctx.request.body.data) {
             throw new ApplicationError("Missing field in request");
         }
 
-        const {accessCode,sessionCode,editedAfter} = ctx.request.body.data;
+        const { accessCode, sessionCode, editedAfter } = ctx.request.body.data;
 
-        if(!accessCode || !sessionCode){
+        if (!accessCode || !sessionCode) {
             throw new UnauthorizedError("Missing table detail");
-        } 
+        }
 
-        const tableID = await strapi.service("api::table.table").verify(accessCode,sessionCode);
+        // Verifica l'accesso al tavolo tramite il servizio
+        const tableID = await strapi.service("api::table.table").verify(accessCode, sessionCode);
 
-        if(!tableID){
+        if (!tableID) {
             throw new UnauthorizedError("Invalid table detail");
         }
-        
+
+        // Recupera l'ordine associato al tavolo
         const order = await strapi.service('api::order.order').getOrderByTable(tableID);
 
-        console.log(JSON.stringify(order,null,3))
+        console.log(JSON.stringify(order, null, 3));
 
-        if(!order){
-            return{
-                data:null,
-                meta:{
-                    edited:true
-                }
-            }
-        }
-
-        if(editedAfter && new Date(order.updatedAt).getTime() < new Date(editedAfter).getTime()){
-            return{
-                meta:{
-                    edited:false
-                }
-            }
-        }
-
-        return{
-            data:reduceOrder(order),
-            meta:{
-                edited:true
-            }
-        }
-
-    },
-
-    //Get all order made by a table
-    async ordersByTable(ctx) {
-        
-        //Check input validity
-        if(!ctx.request.body.data){
-            throw new ApplicationError("Missing field in request");
-        }
-
-        const {accessCode,sessionCode,editedAfter} = ctx.request.body.data;
-
-        if(!accessCode || !sessionCode){
-            throw new UnauthorizedError("Missing table detail");
-        } 
-
-        const tableID = await strapi.service("api::table.table").verify(accessCode,sessionCode);
-
-        console.log(tableID);
-
-        if(!tableID){
-            throw new UnauthorizedError("Invalid table detail");
-        }
-
-        const orders = await strapi.service("api::order.order").getAllOrderByTable(tableID);
-
-        if(!orders || orders.length == 0){
+        if (!order) {
             return {
-                data:[],
-                meta:{
-                    edited:true
-                }
+                data: null,
+                meta: { edited: true }
             };
         }
 
-        if(editedAfter){
-            const editedOrder = orders.filter(o => (new Date(o.updatedAt).getTime() > new Date(editedAfter).getTime()));
-            
-            console.log(JSON.stringify(editedOrder,null,4));
+        // Controlla se l'ordine è stato modificato dopo una determinata data
+        if (editedAfter && new Date(order.updatedAt).getTime() < new Date(editedAfter).getTime()) {
+            return {
+                meta: { edited: false }
+            };
+        }
 
-            if(editedOrder.length == 0){
+        return {
+            data: reduceOrder(order),
+            meta: { edited: true }
+        };
+    },
+
+    /**
+     * Recupera tutti gli ordini effettuati da un tavolo specifico.
+     * 
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Lista degli ordini effettuati dal tavolo.
+     * @throws {UnauthorizedError} Se i dettagli del tavolo non sono forniti o non validi.
+     */
+    async ordersByTable(ctx) {
+        // Verifica la validità dei dati di input
+        if (!ctx.request.body.data) {
+            throw new ApplicationError("Missing field in request");
+        }
+
+        const { accessCode, sessionCode, editedAfter } = ctx.request.body.data;
+
+        if (!accessCode || !sessionCode) {
+            throw new UnauthorizedError("Missing table detail");
+        }
+
+        // Verifica l'accesso al tavolo tramite il servizio
+        const tableID = await strapi.service("api::table.table").verify(accessCode, sessionCode);
+
+        console.log(tableID);
+
+        if (!tableID) {
+            throw new UnauthorizedError("Invalid table detail");
+        }
+
+        // Recupera tutti gli ordini associati al tavolo
+        const orders = await strapi.service("api::order.order").getAllOrderByTable(tableID);
+
+        if (!orders || orders.length == 0) {
+            return {
+                data: [],
+                meta: { edited: true }
+            };
+        }
+
+        // Filtra gli ordini modificati dopo una determinata data
+        if (editedAfter) {
+            const editedOrder = orders.filter(o => (new Date(o.updatedAt).getTime() > new Date(editedAfter).getTime()));
+
+            console.log(JSON.stringify(editedOrder, null, 4));
+
+            if (editedOrder.length == 0) {
                 return {
-                    meta:{
-                        edited:false
-                    }
-                }
+                    meta: { edited: false }
+                };
             }
         }
 
+        // Riduce gli ordini alla struttura desiderata
         const reducedOrder = orders.map(reduceOrder);
 
         return {
-            data:reducedOrder,
-            meta:{
-                edited:true
-            }
-        }
+            data: reducedOrder,
+            meta: { edited: true }
+        };
     }
 }));
 
+/**
+ * Funzione di utilità per ridurre la struttura di un ordine.
+ * 
+ * @param {object} o - Oggetto ordine.
+ * @returns {object} Ordine ridotto.
+ */
 const reduceOrder = (o) => {
-            
     const prod = o.partial_orders.map((p) => p.product);
 
     return {
@@ -200,5 +229,5 @@ const reduceOrder = (o) => {
         status: o.State,
         time: o.TimeToService,
         products: prod,
-    }
-}
+    };
+};

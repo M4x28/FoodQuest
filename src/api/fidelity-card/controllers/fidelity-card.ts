@@ -4,7 +4,12 @@ import Joi from 'joi';
 export default factories.createCoreController('api::fidelity-card.fidelity-card', ({ strapi }) => ({
 
     /**
-     * Aggiorna i punti fedeltà per un utente in base ai prodotti acquistati
+     * Aggiorna i punti fedeltà per un utente in base ai prodotti acquistati.
+     *
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Risultato dell'aggiornamento dei punti fedeltà.
+     * @throws {ValidationError} Se i dati forniti non sono validi.
+     * @throws {InternalServerError} Se si verifica un errore interno del server.
      */
     async addFidelityPoints(ctx) {
         const schema = Joi.object({
@@ -35,11 +40,16 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-     * Calcola lo sconto totale per un tavolo
+     * Calcola lo sconto totale per un tavolo specifico.
+     *
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Sconto calcolato per il tavolo.
+     * @throws {ValidationError} Se i dati forniti non sono validi.
+     * @throws {InternalServerError} Se si verifica un errore interno del server.
      */
     async calculateTableDiscount(ctx) {
         const schema = Joi.object({
-            tableNumber: Joi.number().required(), // Il numero del tavolo è richiesto
+            tableNumber: Joi.number().required(),
         });
 
         const { error } = schema.validate(ctx.request.body);
@@ -69,7 +79,12 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-     * Crea una nuova fidelity card per un utente
+     * Crea una nuova fidelity card per un utente.
+     *
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Fidelity card creata.
+     * @throws {ValidationError} Se i dati forniti non sono validi.
+     * @throws {InternalServerError} Se si verifica un errore interno del server.
      */
     async createFidelityCard(ctx) {
         const schema = Joi.object({
@@ -99,7 +114,12 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-     * Elimina la fidelity card di un utente basandosi sul suo proprietario
+     * Elimina la fidelity card di un utente.
+     *
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Risultato dell'eliminazione.
+     * @throws {ValidationError} Se i dati forniti non sono validi.
+     * @throws {InternalServerError} Se si verifica un errore interno del server.
      */
     async deleteFidelityCard(ctx) {
         const schema = Joi.object({
@@ -129,49 +149,46 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-     * Modifica lo stato del campo UsePoints (0, 1, null)
+     * Modifica lo stato del campo `UsePoints`.
+     *
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Stato aggiornato.
+     * @throws {ValidationError} Se i dati forniti non sono validi.
+     * @throws {InternalServerError} Se si verifica un errore interno del server.
      */
     async updateUsePoints(ctx) {
-        // Schema di validazione per il corpo della richiesta
         const schema = Joi.object({
             data: Joi.object({
-                users_permissions_user: Joi.string().required(), // L'ID dell'utente è richiesto
-                usePoints: Joi.valid(0, 1, null, true, false).required(),    // Lo stato può essere 0, 1 o null
+                users_permissions_user: Joi.string().required(),
+                usePoints: Joi.valid(0, 1, null, true, false).required(),
             }).required(),
         });
 
-        // Valida il corpo della richiesta
         const { error } = schema.validate(ctx.request.body);
         if (error) {
-            // Restituisce un errore di validazione
             return ctx.badRequest({
                 message: 'Errore di validazione dei dati inviati',
                 details: error.details.map((detail) => detail.message),
             });
         }
 
-        // Estrai i dati validati dal corpo della richiesta
         const {
             data: { users_permissions_user, usePoints },
         } = ctx.request.body;
 
         try {
-            // Chiamata al servizio per aggiornare UsePoints
             const response = await strapi
                 .service('api::fidelity-card.fidelity-card')
                 .updateUsePoints(users_permissions_user, usePoints);
 
-            // Risposta in caso di successo
             return ctx.send({
                 success: true,
                 message: 'UsePoints aggiornato con successo',
                 data: response,
             });
         } catch (error) {
-            // Log dell'errore per il debugging
             strapi.log.error('Errore nell\'aggiornamento di UsePoints:', error);
 
-            // Restituisce un errore interno del server
             return ctx.internalServerError({
                 message: 'Errore durante l\'aggiornamento dello stato di UsePoints',
                 details: error.message,
@@ -180,8 +197,13 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-   * Recupera le informazioni di una fidelity card basata sull'ID dell'utente
-   */
+     * Recupera la fidelity card basata sull'ID utente.
+     *
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Fidelity card trovata.
+     * @throws {ValidationError} Se l'ID utente è mancante.
+     * @throws {InternalServerError} Se si verifica un errore interno del server.
+     */
     async getFidelityCard(ctx) {
         const { users_permissions_user } = ctx.params;
 
@@ -214,8 +236,13 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-   * Resetta a 0 i punti di una fidelity card se UsePoints è settato a 1
-   */
+     * Resetta i punti di una fidelity card se `UsePoints` è attivo.
+     *
+     * @param {object} ctx - Contesto della richiesta.
+     * @returns {object} Risultato del reset dei punti.
+     * @throws {ValidationError} Se i dati forniti non sono validi.
+     * @throws {InternalServerError} Se si verifica un errore interno del server.
+     */
     async resetPoints(ctx) {
         const schema = Joi.object({
             users_permissions_user: Joi.array().items(Joi.string().required()).min(1).required(),
