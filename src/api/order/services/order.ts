@@ -233,7 +233,11 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
             },
             populate: {
                 partial_orders: {
-                    populate: ["product"],
+                    populate: {
+                        product:{
+                            populate:["category"]
+                        }
+                    }
                 }
             }
         })
