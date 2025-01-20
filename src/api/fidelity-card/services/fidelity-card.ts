@@ -1,4 +1,5 @@
 import { factories } from '@strapi/strapi';
+const POINT_VALUE = 0.05; // Valore di ogni punto fedeltà
 
 export default factories.createCoreService('api::fidelity-card.fidelity-card', ({ strapi }) => ({
 
@@ -57,38 +58,57 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
     },
 
     /**
-     * Calcola lo sconto totale per un tavolo dato un array di utenti.
-     * @param users - Array di ID degli utenti
-     * @returns Oggetto contenente lo sconto totale e i dettagli per ogni utente
+     * Calcola lo sconto totale per un tavolo dato il numero del tavolo
+     * @param {number} tableNumber - Il numero del tavolo
+     * @returns {number} - Lo sconto totale calcolato
      */
-    async calculateTableDiscount(users: string[]): Promise<object> {
-        let totalDiscount = 0;
-        const userDiscounts = [];
-
-        for (const userId of users) {
-            const fidelityCards = await strapi.documents('api::fidelity-card.fidelity-card').findMany({
-                filters: { users_permissions_user: { documentId: userId } },
-                limit: 1,
+    async calculateTableDiscount(tableNumber) {
+        try {
+            // Trova il tavolo corrispondente al numero e popola gli ordini associati
+            const tables = await strapi.documents('api::table.table').findMany({
+                filters: { Number: tableNumber },
+                populate: {
+                    orders: { // Popola gli ordini associati al tavolo
+                        populate: { // Popola i partial-orders e gli utenti associati
+                            partial_orders: {
+                                populate: {
+                                    users_permissions_user: { populate: { fidelity_card: true } }, // Popola la fidelity card
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
-            if (fidelityCards.length === 0) {
-                userDiscounts.push({ userId, discount: 0, message: 'Fidelity card non trovata' });
-                continue;
+            if (!tables || tables.length === 0) {
+                throw new Error(`Nessun tavolo trovato con il numero ${tableNumber}`);
             }
 
-            const fidelityCard = fidelityCards[0];
+            const table = tables[0]; // Recupera il primo tavolo trovato
 
-            // Calcola lo sconto basato sui punti
-            const discount = fidelityCard.Points * 0.05; // 1 punto = 5 centesimi
-            totalDiscount += discount;
-            userDiscounts.push({ userId, discount });
+            // Verifica se ci sono ordini associati al tavolo
+            if (!table.orders || table.orders.length === 0) {
+                return 0; // Nessun ordine associato, sconto totale = 0
+            }
+
+            // Calcola lo sconto totale basandosi sui punti delle fidelity cards
+            let totalDiscount = 0;
+
+            for (const order of table.orders) {
+                for (const partialOrder of order.partial_orders) {
+                    const fidelityCard = partialOrder.users_permissions_user?.fidelity_card;
+                    if (fidelityCard && fidelityCard.Points) {
+                        totalDiscount += fidelityCard.Points; // Somma i punti della fidelity card
+                    }
+                }
+            }
+
+            // Restituisci lo sconto totale calcolato
+            return totalDiscount * POINT_VALUE;
+        } catch (error) {
+            strapi.log.error('Errore durante il calcolo dello sconto totale per il tavolo:', error);
+            throw new Error('Errore durante il calcolo dello sconto totale per il tavolo');
         }
-
-        return {
-            success: true,
-            message: 'Sconto totale calcolato',
-            data: { totalDiscount: totalDiscount.toFixed(2), userDiscounts },
-        };
     },
 
     /**

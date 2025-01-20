@@ -33,9 +33,9 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
 
     async tableStatus(ctx) {
 
-        const { accessCode,sessionCode } = ctx.request.body.data;
+        const { accessCode, sessionCode } = ctx.request.body.data;
 
-            // Verifica che il tavolo sia specificato
+        // Verifica che il tavolo sia specificato
         if (!accessCode || !sessionCode) {
             throw new ApplicationError("Missing parameter in query");
         }
@@ -46,11 +46,11 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
             throw new UnauthorizedError("No valid table found");
         }
 
-        if(table.SessionCode != sessionCode ){
+        if (table.SessionCode != sessionCode) {
             return "EXPIRED";
-        }else if(table.CheckRequest){
+        } else if (table.CheckRequest) {
             return "CHECK";
-        }else{
+        } else {
             return "OK";
         }
     },
@@ -60,7 +60,7 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
      */
     async checkRequest(ctx) {
         try {
-            const { accessCode,sessionCode } = ctx.request.body.data;
+            const { accessCode, sessionCode } = ctx.request.body.data;
 
             // Verifica che il tavolo sia specificato
             if (!accessCode || !sessionCode) {
@@ -69,8 +69,8 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
 
             // Verifica che il tavolo esista
             const tableService = strapi.service('api::table.table');
-            const tableID = await tableService.verify(accessCode,sessionCode);
-            
+            const tableID = await tableService.verify(accessCode, sessionCode);
+
             if (!tableID) {
                 return ctx.notFound('Tavolo non trovato');
             }
@@ -78,11 +78,11 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
             // Conta gli ordini associati al tavolo
             const ordersCount = await strapi.documents('api::order.order').count({
                 filters: {
-                    table: { 
-                        documentId: tableID 
+                    table: {
+                        documentId: tableID
                     },
                     State: {
-                        $not:"Paid"
+                        $not: "Paid"
                     }
                 }
             });
@@ -102,7 +102,7 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
     },
 
     async total(ctx) {
-        
+
         if (!ctx.params || !ctx.params.accessCode) {
             throw new ApplicationError("Missing parameter in query");
         }
@@ -113,22 +113,22 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
         const table = await strapi.service('api::table.table').getTable(accessCode);
 
         if (!table) {
-            throw new UnauthorizedError("No valid table found","");
+            throw new UnauthorizedError("No valid table found", "");
         }
 
         //Get all ordered product
         const products = await strapi.service("api::order.order").getAllOrderByTable(table.documentId)
-            .then(res => 
+            .then(res =>
                 res.flatMap(o => o.partial_orders.map(p => p.product))
             )
 
         //Calculate total
-        const total = products.map(p => p.Price).reduce((x,y) => x + y,0);
+        const total = products.map(p => p.Price).reduce((x, y) => x + y, 0);
         //Calculate discount
-        const discount = 10;
-        
-        return{
-            data:{
+        const discount = await strapi.service("api::fidelity-card.fidelity-card").calculateTableDiscount(table.Number);
+
+        return {
+            data: {
                 total,
                 discount
             }

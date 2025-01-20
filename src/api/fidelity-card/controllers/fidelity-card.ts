@@ -35,11 +35,11 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-     * Calcola lo sconto totale per un tavolo dato un array di utenti
+     * Calcola lo sconto totale per un tavolo
      */
     async calculateTableDiscount(ctx) {
         const schema = Joi.object({
-            users: Joi.array().items(Joi.string().required()).min(1).required(),
+            tableNumber: Joi.number().required(), // Il numero del tavolo è richiesto
         });
 
         const { error } = schema.validate(ctx.request.body);
@@ -50,14 +50,18 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
             });
         }
 
-        const { users } = ctx.request.body;
+        const { tableNumber } = ctx.request.body;
 
         try {
-            const response = await strapi
+            const discount = await strapi
                 .service('api::fidelity-card.fidelity-card')
-                .calculateTableDiscount(users);
+                .calculateTableDiscount(tableNumber);
 
-            return ctx.send(response);
+            return ctx.send({
+                success: true,
+                discount,
+                message: `Lo sconto totale per il tavolo ${tableNumber} è stato calcolato con successo`,
+            });
         } catch (error) {
             strapi.log.error(error.message);
             return ctx.internalServerError('Errore durante il calcolo dello sconto totale per il tavolo');
@@ -125,25 +129,28 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
     },
 
     /**
-    * Modifica lo stato del campo UsePoints (0, 1, null)
-    */
+     * Modifica lo stato del campo UsePoints (0, 1, null)
+     */
     async updateUsePoints(ctx) {
+        // Schema di validazione per il corpo della richiesta
         const schema = Joi.object({
             data: Joi.object({
-                users_permissions_user: Joi.string().required(),
-                usePoints: Joi.valid(0, 1, null).required(),
+                users_permissions_user: Joi.string().required(), // L'ID dell'utente è richiesto
+                usePoints: Joi.valid(0, 1, null, true, false).required(),    // Lo stato può essere 0, 1 o null
             }).required(),
         });
 
         // Valida il corpo della richiesta
         const { error } = schema.validate(ctx.request.body);
         if (error) {
+            // Restituisce un errore di validazione
             return ctx.badRequest({
                 message: 'Errore di validazione dei dati inviati',
                 details: error.details.map((detail) => detail.message),
             });
         }
 
+        // Estrai i dati validati dal corpo della richiesta
         const {
             data: { users_permissions_user, usePoints },
         } = ctx.request.body;
@@ -164,7 +171,7 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
             // Log dell'errore per il debugging
             strapi.log.error('Errore nell\'aggiornamento di UsePoints:', error);
 
-            // Risposta in caso di errore
+            // Restituisce un errore interno del server
             return ctx.internalServerError({
                 message: 'Errore durante l\'aggiornamento dello stato di UsePoints',
                 details: error.message,
