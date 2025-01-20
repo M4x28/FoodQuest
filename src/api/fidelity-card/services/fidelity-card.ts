@@ -72,7 +72,13 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
                         populate: { // Popola i partial-orders e gli utenti associati
                             partial_orders: {
                                 populate: {
-                                    users_permissions_user: { populate: { fidelity_card: true } }, // Popola la fidelity card
+                                    users_permissions_user: {
+                                        populate: {
+                                            fidelity_card: {
+                                                filters: { UsePoints: true },
+                                            },
+                                        },
+                                    },
                                 },
                             },
                         },
