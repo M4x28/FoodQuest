@@ -242,6 +242,33 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
                 }
             }
         });
-    }
+    },
+
+    /**
+   * Rimuove un prodotto da un ordine parziale.
+   * @param {string} orderId - ID dell'ordine
+   * @param {string} productId - ID del prodotto
+   * @returns {boolean} - Ritorna true se il prodotto è stato rimosso, altrimenti false
+   */
+    async removeProductFromOrder(orderId: string, productId: string): Promise<boolean> {
+        // Trova l'ordine parziale associato all'ordine e al prodotto
+        const partialOrder = await strapi.documents('api::partial-order.partial-order').findFirst({
+            filters: {
+                order: { documentId: orderId },
+                product: { documentId: productId },
+            },
+        });
+
+        if (!partialOrder) {
+            return null; // Restituisci null se l'ordine parziale non è trovato
+        }
+
+        // Elimina l'ordine parziale trovato
+        await strapi.documents('api::partial-order.partial-order').delete({
+            documentId: partialOrder.documentId,
+        });
+
+        return true; // Indica che l'operazione è stata completata con successo
+    },
 
 }));

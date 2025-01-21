@@ -172,9 +172,7 @@ export default factories.createCoreController('api::fidelity-card.fidelity-card'
             });
         }
 
-        const {
-            data: { users_permissions_user, usePoints },
-        } = ctx.request.body;
+        const { users_permissions_user, usePoints } = ctx.request.body.data;
 
         try {
             const response = await strapi

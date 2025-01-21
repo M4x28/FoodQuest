@@ -19,6 +19,11 @@ export default {
             method: "POST",
             path: "/order/get_orders",
             handler: "order.ordersByTable"
+        },
+        {
+            method: 'POST',
+            path: '/order/remove-product',
+            handler: 'order.removeProduct',
         }
     ]
 }

@@ -212,7 +212,42 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
             data: reducedOrder,
             meta: { edited: true }
         };
-    }
+    },
+
+    /**
+   * Controller per rimuovere un prodotto da un ordine.
+   * @param {Object} ctx - Context di Strapi contenente i parametri `orderId` e `productId`.
+   */
+    async removeProduct(ctx) {
+        try {
+            // Log della richiesta per debug
+            console.log("Richiesta ricevuta:", ctx);
+
+            // Estrazione dei parametri da body.data
+            const { orderId, productId } = ctx.request.body?.data || {};
+
+            // Validazione personalizzata dei parametri
+            if (!orderId || !productId) {
+                return ctx.badRequest('I parametri "orderId" e "productId" sono richiesti.');
+            }
+
+            // Chiamata al service per rimuovere il prodotto
+            const result = await strapi.service('api::order.order').removeProductFromOrder(orderId, productId);
+
+            if (!result) {
+                return ctx.notFound("Prodotto non trovato nell'ordine.");
+            }
+
+            // Risposta di successo
+            return ctx.send({ message: 'Prodotto rimosso con successo dall\'ordine.' });
+        } catch (error) {
+            // Log dell'errore
+            strapi.log.error('Errore durante la rimozione del prodotto dall\'ordine:', error);
+
+            // Risposta di errore generica
+            return ctx.internalServerError('Errore durante la rimozione del prodotto dall\'ordine.');
+        }
+    },
 }));
 
 /**
