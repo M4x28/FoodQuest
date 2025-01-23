@@ -6,10 +6,11 @@ import { factories } from '@strapi/strapi';
 
 // Interfaccia per definire i dettagli degli ingredienti di un prodotto
 export interface ProductIngredientDetail {
-    categoryID: string,     // ID della categoria del prodotto
-    price: number,          // Prezzo del prodotto
-    name: string,           // Nome del prodotto
-    ingredientsID: string[] // Array di ID degli ingredienti del prodotto
+    categoryID: string,     
+    price: number,          
+    name: string,           
+    time: number,
+    ingredientsID: string[]
 }
 
 export default factories.createCoreService('api::product.product', (({ strapi }) => ({
@@ -23,14 +24,14 @@ export default factories.createCoreService('api::product.product', (({ strapi })
     async createIgProduct(product: ProductIngredientDetail): Promise<string> {
         console.log("Creating Product", product);
 
-        // Verifica se esiste già un prodotto con gli stessi ingredienti
+        // Verify that exist a product with the same ingredient and category
         const targetProduct: string | null = await this.findProductFromIngredient(product);
 
+        //If exist return it
         if (targetProduct) {
-            // Restituisce l'ID del prodotto esistente
             return targetProduct;
         } else {
-            // Crea un nuovo prodotto
+            // Create new product
             return await productFactory(product);
         }
     },
@@ -46,17 +47,17 @@ export default factories.createCoreService('api::product.product', (({ strapi })
             .findMany({
                 populate: {
                     ingredients: {
-                        fields: ["id"], // Recupera solo gli ID degli ingredienti
+                        fields: ["id"],
                     },
                     product: {
-                        fields: ["id"], // Recupera solo gli ID dei prodotti
+                        fields: ["id"],
                     }
                 },
                 filters: {
                     category: {
-                        documentId: product.categoryID, // Filtra per categoria
+                        documentId: product.categoryID,
                     },
-                    // Controlla che il wrapper contenga esattamente gli ingredienti richiesti
+                    //Verify that wrapper has every ingredient requested
                     $and: product.ingredientsID.map((ig) => ({
                         ingredients: {
                             documentId: ig,
@@ -64,14 +65,13 @@ export default factories.createCoreService('api::product.product', (({ strapi })
                     }))
                 },
             }).then((result) => {
-                // Filtra per trovare il wrapper con esattamente il numero di ingredienti richiesti
+                //Check if any of the match has the exact nuber of element
                 const targetWrapper = result.filter((value) => value.ingredients.length == product.ingredientsID.length);
 
                 if (targetWrapper.length == 1) {
-                    // Restituisce l'ID del prodotto associato
+                    //If one found return the product id
                     return targetWrapper[0].product.documentId;
                 } else {
-                    // Nessun prodotto corrispondente trovato
                     return null;
                 }
             });
@@ -152,7 +152,7 @@ export async function productFactory(product: ProductIngredientDetail): Promise<
                     category: product.categoryID,
                     Available: false,
                     allergens: allergens, // Associa gli allergeni trovati
-                    TimeToPrepare: product.ingredientsID.length + 2, // Tempo di preparazione basato sul numero di ingredienti
+                    TimeToPrepare: product.time, // Tempo di preparazione basato sul numero di ingredienti
                     Price: product.price // Prezzo del prodotto
                 },
                 status: "published", // Imposta lo stato come pubblicato

@@ -59,13 +59,15 @@ async function processPizza(product: any): Promise<ProductIngredientDetail | nul
         // Calcola il prezzo totale
         let price: number = base.Price;
         price += ingredients.reduce((tot, prod) => tot + prod.Price, 0);
+        const time = Math.ceil(4 + (ingredients.length * 2) / 3);
 
         // Unisce la base e gli ingredienti in un unico elenco
         return {
-            name: "Custom", // Nome del prodotto personalizzato
-            price: price, // Prezzo totale calcolato
-            categoryID: product.categoryID, // ID della categoria del prodotto
-            ingredientsID: [product.baseID, ...product.ingredientsID], // ID della base e degli ingredienti
+            name: "Custom", 
+            price: price,
+            categoryID: product.categoryID,
+            ingredientsID: [product.baseID, ...product.ingredientsID],
+            time: time
         };
     } else {
         return null; // Ritorna null se la validazione fallisce

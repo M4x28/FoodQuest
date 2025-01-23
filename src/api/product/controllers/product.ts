@@ -9,13 +9,12 @@ import clientProductRule from './preprocessRules';
 
 const { ApplicationError, UnauthorizedError } = errors;
 
-// Crea un preprocessore per i prodotti del cliente utilizzando le regole definite
+// Prepoceesor to apply rules on created product (for client)
 const clientPreprocessor = new productPreprocessor(clientProductRule);
 
-// Definisce l'interfaccia per rappresentare i dettagli di un tavolo
 interface Table {
-    accessCode: string,    // Codice di accesso al tavolo
-    sessionCode: string    // Codice di sessione del tavolo
+    accessCode: string,
+    sessionCode: string
 }
 
 export default factories.createCoreController('api::product.product', (({ strapi }) => ({
@@ -29,33 +28,36 @@ export default factories.createCoreController('api::product.product', (({ strapi
      * @throws {UnauthorizedError} Se le credenziali del tavolo non sono valide.
      */
     async createCustomProduct(ctx) {
-        // Verifica che la richiesta contenga i campi necessari
+        
+        //Verify requested are in body
         if (!ctx.request.body || !ctx.request.body.table || !ctx.request.body.product) {
             throw new ApplicationError("Missing field in request");
         }
 
-        // Estrai i dettagli del tavolo e del prodotto dalla richiesta
+        //Unpack body
         const { table, product } = ctx.request.body as { table: Table, product: any };
 
-        // Verifica il codice di accesso al tavolo, solo gli utenti di un tavolo possono accedere a questa funzionalità
+        //Verify table info, only user at a table can use this funtionality
         const tableID = await strapi.service("api::table.table").verify(table.accessCode, table.sessionCode);
         if (!tableID) {
             throw new UnauthorizedError("Invalid table credential");
         }
 
-        // Preprocessa il prodotto prima della creazione
+        //Preprosser product before creating
         const processedProd = await clientPreprocessor.process(product);
+        
+        //Check for rejection
         if (!processedProd) {
             throw new ApplicationError("Wrong Product Format");
         }
 
-        // Crea un nuovo prodotto utilizzando il servizio dedicato
+        //Create the new product
         const prodID = await strapi.service("api::product.product").createIgProduct(processedProd);
+        
         if (!prodID) {
             throw new ApplicationError("Wrong Input Format");
         }
 
-        // Restituisce l'ID del prodotto creato
         return { data: { id: prodID } };
     },
 
