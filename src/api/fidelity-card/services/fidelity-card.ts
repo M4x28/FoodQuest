@@ -58,18 +58,19 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
     },
 
     /**
-     * Calcola lo sconto totale per un tavolo dato il numero del tavolo
-     * @param {number} tableNumber - Il numero del tavolo
-     * @returns {number} - Lo sconto totale calcolato
-     */
+ * Calcola lo sconto totale per un tavolo dato il numero del tavolo,
+ * garantendo che lo sconto massimo non renda il conto negativo.
+ * @param {number} tableNumber - Il numero del tavolo
+ * @returns {Promise<number>} - Lo sconto totale calcolato
+ */
     async calculateTableDiscount(tableNumber: number): Promise<number> {
         try {
             // Trova il tavolo corrispondente al numero e popola gli ordini associati
             const tables = await strapi.documents('api::table.table').findMany({
                 filters: { Number: tableNumber },
                 populate: {
-                    orders: { // Popola gli ordini associati al tavolo
-                        populate: { // Popola i partial-orders e gli utenti associati
+                    orders: {
+                        populate: {
                             partial_orders: {
                                 populate: {
                                     users_permissions_user: {
@@ -109,8 +110,14 @@ export default factories.createCoreService('api::fidelity-card.fidelity-card', (
                 }
             }
 
-            // Restituisci lo sconto totale calcolato
-            return totalDiscount * POINT_VALUE;
+            // Recupera il totale del conto del tavolo
+            const tableTotal = await strapi.service('api::table.table').total(table.documentId);
+
+            // Calcola lo sconto effettivo limitato dal totale del conto
+            const maxDiscount = Math.min(totalDiscount * POINT_VALUE, tableTotal);
+
+            // Restituisci lo sconto effettivo
+            return maxDiscount;
         } catch (error) {
             strapi.log.error('Errore durante il calcolo dello sconto totale per il tavolo:', error);
             throw new Error('Errore durante il calcolo dello sconto totale per il tavolo');
