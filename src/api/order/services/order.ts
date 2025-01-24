@@ -124,8 +124,12 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
         const products = await strapi.documents("api::product.product").findMany({
             filters: {
                 partial_orders: {
-                    State: { $not: "Pending" },
-                    order: { documentId: orderID },
+                    State: {
+                        $not:"Done",
+                    },
+                    order: {
+                        documentId: orderID 
+                    },
                 }
             },
             populate: ["category"]
@@ -162,8 +166,12 @@ export default factories.createCoreService('api::order.order', ({ strapi }) => (
     async getOrderBefore(isoDate: string) {
         return strapi.documents("api::order.order").findFirst({
             filters: {
-                Datetime: { $lt: isoDate },
-                State: { $not: OrderState.New }
+                Datetime: { 
+                    $lt: isoDate 
+                },
+                State:{ 
+                    $notIn: [OrderState.New, OrderState.Paid]
+                }
             },
             sort: [{ Datetime: "desc" }]
         });
