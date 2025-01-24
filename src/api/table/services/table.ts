@@ -64,6 +64,17 @@ export default factories.createCoreService('api::table.table', (({ strapi }) => 
             // Restituisce false in caso di errore
             return false;
         }
+    },
+
+    async total(tableID:string): Promise<number> {
+
+        const products = await strapi.service("api::order.order").getAllOrderByTable(tableID)
+            .then(res =>
+                res.flatMap(o => o.partial_orders.map(p => p.product))
+            );
+
+        // Calcola il totale dei prodotti
+        return products.map(p => p.Price).reduce((x, y) => x + y, 0);
     }
 
 })));

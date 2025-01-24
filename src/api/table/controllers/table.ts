@@ -139,15 +139,8 @@ export default factories.createCoreController('api::table.table', (({ strapi }) 
         if (!table) {
             throw new UnauthorizedError("No valid table found", "");
         }
-
-        // Recupera tutti i prodotti ordinati dal tavolo
-        const products = await strapi.service("api::order.order").getAllOrderByTable(table.documentId)
-            .then(res =>
-                res.flatMap(o => o.partial_orders.map(p => p.product))
-            );
-
-        // Calcola il totale dei prodotti
-        const total = products.map(p => p.Price).reduce((x, y) => x + y, 0);
+        
+        const total = await strapi.service("api::table.table").total(table.documentId)
 
         // Calcola lo sconto totale applicabile al tavolo
         const discount = await strapi.service("api::fidelity-card.fidelity-card").calculateTableDiscount(table.Number);
