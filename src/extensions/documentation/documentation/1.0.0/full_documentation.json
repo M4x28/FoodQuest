@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-01-27T16:55:36.059Z"
+    "x-generation-date": "2025-03-15T18:01:54.695Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -7551,6 +7551,9 @@
                                     }
                                   }
                                 },
+                                "ShowOrder": {
+                                  "type": "integer"
+                                },
                                 "createdAt": {
                                   "type": "string",
                                   "format": "date-time"
@@ -9608,6 +9611,9 @@
                                   }
                                 }
                               },
+                              "ShowOrder": {
+                                "type": "integer"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -10902,6 +10908,9 @@
                   "example": "string or id"
                 }
               },
+              "ShowOrder": {
+                "type": "integer"
+              },
               "locale": {
                 "type": "string"
               },
@@ -11022,6 +11031,9 @@
                           }
                         }
                       }
+                    },
+                    "ShowOrder": {
+                      "type": "integer"
                     },
                     "createdAt": {
                       "type": "string",
@@ -12858,6 +12870,9 @@
               }
             }
           },
+          "ShowOrder": {
+            "type": "integer"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -13588,6 +13603,9 @@
                                   }
                                 }
                               }
+                            },
+                            "ShowOrder": {
+                              "type": "integer"
                             },
                             "createdAt": {
                               "type": "string",
@@ -15819,6 +15837,9 @@
                                         }
                                       }
                                     },
+                                    "ShowOrder": {
+                                      "type": "integer"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -17897,6 +17918,9 @@
                                     }
                                   }
                                 },
+                                "ShowOrder": {
+                                  "type": "integer"
+                                },
                                 "createdAt": {
                                   "type": "string",
                                   "format": "date-time"
@@ -19387,6 +19411,9 @@
                               }
                             }
                           }
+                        },
+                        "ShowOrder": {
+                          "type": "integer"
                         },
                         "createdAt": {
                           "type": "string",
@@ -21461,6 +21488,9 @@
                         }
                       }
                     }
+                  },
+                  "ShowOrder": {
+                    "type": "integer"
                   },
                   "createdAt": {
                     "type": "string",
@@ -25384,6 +25414,9 @@
                   }
                 }
               },
+              "ShowOrder": {
+                "type": "integer"
+              },
               "createdAt": {
                 "type": "string",
                 "format": "date-time"
@@ -25883,6 +25916,9 @@
                                     }
                                   }
                                 }
+                              },
+                              "ShowOrder": {
+                                "type": "integer"
                               },
                               "createdAt": {
                                 "type": "string",
