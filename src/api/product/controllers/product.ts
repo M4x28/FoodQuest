@@ -4,8 +4,8 @@
 
 import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
-import { productPreprocessor } from './productPreprocessor';
 import clientProductRule from './preprocessRules';
+import { productPreprocessor } from './productPreprocessor';
 
 const { ApplicationError, UnauthorizedError } = errors;
 
@@ -28,7 +28,7 @@ export default factories.createCoreController('api::product.product', (({ strapi
      * @throws {UnauthorizedError} Se le credenziali del tavolo non sono valide.
      */
     async createCustomProduct(ctx) {
-        
+
         //Verify requested are in body
         if (!ctx.request.body || !ctx.request.body.table || !ctx.request.body.product) {
             throw new ApplicationError("Missing field in request");
@@ -45,7 +45,9 @@ export default factories.createCoreController('api::product.product', (({ strapi
 
         //Preprosser product before creating
         const processedProd = await clientPreprocessor.process(product);
-        
+        console.log(ctx.request.body.product);
+        console.log(product);
+
         //Check for rejection
         if (!processedProd) {
             throw new ApplicationError("Wrong Product Format");
@@ -53,7 +55,7 @@ export default factories.createCoreController('api::product.product', (({ strapi
 
         //Create the new product
         const prodID = await strapi.service("api::product.product").createIgProduct(processedProd);
-        
+
         if (!prodID) {
             throw new ApplicationError("Wrong Input Format");
         }
